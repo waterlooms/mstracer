@@ -66,7 +66,7 @@ java -jar ms-tracer_final.jar data/your-file-name.mzXML
 ```
 ```your-file-name.mzXML_feature``` is the final output.
 
-#### Trouble shooting
+#### Troubleshooting
 ##### Note1
 Should there be any issue with Step 4, another way is to run ```NN.py``` using PyCharm. 
 
