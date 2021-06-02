@@ -1,0 +1,6 @@
+# Ignore mzml, mzXML and RAW files.
+*.mzML
+*.mzXML
+*.RAW
+*.mzXML_feature_all_z
+*.mzXML_feature_all_z_svr_nn_score

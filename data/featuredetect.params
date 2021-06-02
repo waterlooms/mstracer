@@ -1,0 +1,20 @@
+# Parameters for MS1 Feature Detection
+
+C12_MASS=12
+C13_MASS=13.003355
+# 10ppm
+PPM=0.00001
+# 10ppm, +/- m/z*PPM from m/z peak
+MZ_TOLERANCE_PPM=0.00001
+# number of consequent isotopic features to be identified
+MIN_CHECK=2
+MASS_STEP=10
+MIN_REL_HEIGHT=0.01
+INVALID_VAL=-1
+PERCENTAGE_OF_MAX=0.5
+INTENSITY_THRESHOLD=10000
+Z_RANGE=5
+Z_RANGE_MAX=10
+WINDOW_SIZE=4
+WINDOW_HI=7
+INTENSITY_BOUND=1.5
