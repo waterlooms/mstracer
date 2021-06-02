@@ -1,0 +1,15 @@
+id  --  index
+mz  --  mass to charge ratio of the maximal peak
+rt  --  retention time of the maximal peak
+z   --  charge state
+isotope_num --  the number of isotopes
+intensity_shape_score   --  coelution coefficient, measures how similarly the trails in a peptide feature change their intensities over RT
+isotope_distribution_score  --  isotope shape coefficient, measure the similarity of the isotopic distribution of a peptide feature and its theoretical isotopic distribution
+intensity_window_avg    --  the average intensity over the start and end retention time
+intensity_area_percentage   --  the relative intensity in the surrounding area.
+rt_start    --  starting retention time
+rt_end  --  ending retention time
+scan_num    -- the number of scans of a trail
+intensity_sum   --  the total intensity of all isotopes in a peptide feature
+SVR_score   --  the SVR score for conflicting isotope group removel, trained with SVR model based on isotope_num, intensity_shape_score, and isotope_distribution_score
+quality_score -- the MSTracer quality score for ranking, trained with NN model based on isotope_num, intensity_shape_score, isotope_distribution_score, and intensity_area_percentage

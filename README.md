@@ -5,11 +5,11 @@ Clone & navigate to the repository.
 ```
 git clone https://github.com/waterlooms/ms-tracer.git
 ```
-Make sure your python version is later than 3.6.
+Python version 3.6 is used to be compatible with the Tensorflow version. You can check your Python version by:
 ```
 python3 --version # check version
 ```
-If not downloaded, please visit https://python.org/download.
+If not downloaded, please visit https://python.org/download and download Python3.6.
 
 Download scikit-learn(version 0.22) & tensorflow(1.14.0) using python3.
 ```
@@ -22,14 +22,14 @@ pip3 install 'h5py==2.10.0' --force-reinstall
 Put your .mzXML or .mzML file in ``` data/ ``` or any designated folder.
 Your output files will be generated in that folder as well.
 
-In the commands, replace ```your-file-name.mzXML``` with your file name, or try with a preloaded data ```toy.mzXML```.
+In the commands, replace ```your-file-name.mzXML``` with your file name, or try with a preloaded data ```sample.mzXML```.
 
 Then you could simply run a bash file in terminal:
 ```
 cd ms-tracer/
 bash ms-tracer.bash data/your-file-name.mzXML
 ```
-```your-file-name.mzXML_feature``` is the final output.
+The output file is```your-file-name_mstracer.tsv```.
 
 #### Explanation
 
@@ -64,7 +64,7 @@ python3 NN.py -feature data/your-file-name.mzXML
 ```
 java -jar ms-tracer_final.jar data/your-file-name.mzXML 
 ```
-```your-file-name.mzXML_feature``` is the final output.
+```your-file-name.mzXML_feature``` is the output on this step, where the final output ```your-file-name_mstracer.tsv``` is the ".tsv" format of this file.
 
 #### Troubleshooting
 ##### Note1
@@ -72,7 +72,7 @@ Should there be any issue with Step 4, another way is to run ```NN.py``` using P
 
 Right click the "tensorflow" at the third line, choose "Show Context Actions"; choose "install package tensorflow". This sets up a virtual environment that runs Tensorflow.
 
-In the configuration, (1) choose Python from Templates. (2)Set the script path to that of ```NN.py``` (e.g.```home/Desktop/ms-tracer/NN.py```). (3) Parameters should be "-feature data/your-file-name.mzXML" 
+In the configuration, (1) choose Python from Templates. (2)Set the script path to that of ```NN.py``` (e.g.```home/Desktop/ms-tracer/src/main/python/NN.py```). (3) Parameters should be "-feature data/your-file-name.mzXML" 
 
 ##### Note2
 If you encounter any issues please feel free to reach by emailing x25zeng@uwaterloo.ca.
