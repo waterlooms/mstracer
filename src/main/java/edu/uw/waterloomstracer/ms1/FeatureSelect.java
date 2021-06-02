@@ -86,7 +86,6 @@ public class FeatureSelect {
       svrScores.add(ms1Precursor);
     }
 
-    // TODO: For each model_result row, save them into svrScores.
     writeFile(filepath + "_feature", model_result, ml);
 
     return svrScores;

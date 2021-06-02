@@ -118,7 +118,6 @@ public class Main {
 
     processBuilder.command(svrCommand);
     try {
-      // TODO: Suppress output if necessary for python
       Process process = processBuilder.inheritIO().start();
       int exitCode = process.waitFor();
       System.out.println("\nSVR.py exited with code : " + exitCode);
