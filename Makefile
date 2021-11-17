@@ -5,7 +5,7 @@ rebuild:
 	docker-compose up --build -d --force
 
 shell: force
-	docker-compose exec waterlooms bash
+	docker-compose exec mstracer bash
 
 force:
 
