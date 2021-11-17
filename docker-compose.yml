@@ -2,7 +2,7 @@ version: '2.3'
 
 # TODO: Map the USER into this container as well so the user doesn't have to use sudo
 services:
-  mstracker:
+  waterlooms:
     build: ./
     environment:
       - NVIDIA_VISIBLE_DEVICES=all

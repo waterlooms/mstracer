@@ -13,7 +13,7 @@ VOLUME /mstracer
 # Compile Dependencies in order to run Pythonic Code
 RUN apt-get update && \
 	apt-get install -y maven && \
-	pip install python-dotenv h5py tensorflow-gpu==2.1.0 scikit-learn==0.22.2.post1
+	pip install python-dotenv h5py tensorflow-gpu==2.0.0 scikit-learn==0.22.2.post1
 
 # Export Python executables to the PATH
 ENV PATH=/waterlooms/src/main/python:$PATH
@@ -23,15 +23,4 @@ ENV RUN_WITHIN_CONTAINER=TRUE
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get -y install postgresql
 
-
-# WORKDIR /waterlooms
-#/usr/lib/postgresql/10/bin/pg_ctl -D /var/lib/postgresql/10/main >/waterlooms/db/logfile 2>&1 &
-
-# Set the user for creation of waterlooms user
-#USER postgres
-#RUN /etc/init.d/postgresql start && \
-#	psql --command "CREATE USER waterlooms WITH SUPERUSER PASSWORD 'waterlooms';" && \
-#	createdb -O waterlooms waterlooms
-
-# Revert to root for execution
 USER root
