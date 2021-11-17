@@ -1,0 +1,5 @@
+#ignore everthing
+*
+
+# Do not ignore scripts.
+!*.sh

@@ -1,21 +1,36 @@
 # MSTracer Workflow
+
+ms-tracer version 1.1.0
  
+ ### Quick Start
+* [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/)  
+Download and install Docker.    
+```
+sudo apt-get update
+sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - 
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+sudo apt-get update
+sudo apt-get install docker-ce
+
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```  
+Reboot your computer to apply the new group permissions at this point.  
+Install Docker-Compose.  
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+```
 ### Code Setup
 Clone & navigate to the repository.
 ```
 git clone https://github.com/waterlooms/ms-tracer.git
-```
-Python version 3.6 is used to be compatible with the Tensorflow version. You can check your Python version by:
-```
-python3 --version # check version
-```
-If not downloaded, please visit https://python.org/download and download Python3.6.
-
-Download scikit-learn(version 0.22) & tensorflow(1.14.0) using python3.
-```
-pip3 install -U scikit-learn==0.22 scipy matplotlib
-pip3 install tensorflow==1.14.0
-pip3 install 'h5py==2.10.0' --force-reinstall
+cd ms-tracer
 ```
 
 ### Usage 
@@ -24,47 +39,37 @@ Your output files will be generated in that folder as well.
 
 In the commands, replace ```your-file-name.mzXML``` with your file name, or try with a preloaded data ```sample.mzXML```.
 
-Then you could simply run a bash file in terminal:
-```
-cd ms-tracer/
-bash ms-tracer.bash data/your-file-name.mzXML
-```
 The output file is```your-file-name_mstracer.tsv```.
 
-#### Explanation
+Structure at dia_data_reading/ should look like the following:  
 
-You could also execute without using bash.
-In details, the program does the following steps:
+```
+dia_data_reading/
+└───.github/workflows/
+└───data/
+└───scripts/
+└───src/
+│   └───main/
+│      └───java/edu/uw/waterlooms/
+│      └───python/
+│      └───resources/
+│   └───test/
+.dockerignore
+.gitignore
+Dockerfile
+Makefile
+docker-compose.yml
+pom.xml
+README.md
+output_file_instruction.txt
+```
 
-##### Step 1, initial detection of peptide features.
-```
-java -jar ms-tracer_detect.jar data/your-file-name.mzXML 
-```
-```your-file-name.mzXML_feature_all_z``` is the output in this step.
+Your data files should be located in the *data/* folder.  
+By default, the program will execute on the *toy.mzXML* file located in *dia_data_reading/data/*.  
+JAVA source files should go under *dia_data_reading/src/main/java/edu/uw/waterlooms/*.  
+PYTHON source files should go under *dia_data_reading/src/main/python/*.
 
-##### Step 2, SVR model prediction.
-```
-python3 SVR.py -feature data/your-file-name.mzXML
-```
-```your-file-name.mzXML_svr_score``` is the output in this step.
 
-##### Step 3, charge state selection from the SVR model prediction.
-```
-java -jar ms-tracer_select.jar data/your-file-name.mzXML
-```
-```your-file-name.mzXML_feature_one_z``` is the output in this step.
-
-##### Step 4, NN model prediction.
-```
-python3 NN.py -feature data/your-file-name.mzXML
-```
-```your-file-name.mzXML_nn_score``` is the output in this step.
-
-##### Step 5, ranking from NN model prediction and finalization.
-```
-java -jar ms-tracer_final.jar data/your-file-name.mzXML 
-```
-```your-file-name.mzXML_feature``` is the output on this step, where the final output ```your-file-name_mstracer.tsv``` is the ".tsv" format of this file.
 
 #### Troubleshooting
 ##### Note1

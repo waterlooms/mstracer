@@ -1,0 +1,4 @@
+# Specify the directories to ignore when building the image. Avoids large copying costs.
+data/*
+
+
