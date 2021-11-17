@@ -29,7 +29,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 ### Code Setup
 Clone & navigate to the repository.
 ```
-git clone https://github.com/waterlooms/ms-tracer.git
+git clone https://github.com/waterlooms/mstracer.git
 cd ms-tracer
 ```
 
