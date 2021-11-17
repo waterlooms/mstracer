@@ -16,7 +16,7 @@ public class FeatureDetectIntegrationTest {
         /* Given */
         String dataDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/";
         String featureDetectParamFile = dataDirectory + "/featuredetect.params";
-        String rawFileName = "Fig1_MP-DIA-120min120kMS1-22W30k-8dppp_MHRM_R01.mzXML";
+        String rawFileName = "toy.mzXML";
         String mzxmlFile = dataDirectory + rawFileName;
         int rtNextPeakTolSec = 5;  // 5sec
         double mzTolerancePPMStrict = 10e-6; // 10ppm
