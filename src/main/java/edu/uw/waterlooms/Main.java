@@ -114,7 +114,7 @@ public class Main {
     System.out.println("Running SVR.py ...");
     ProcessBuilder processBuilder = new ProcessBuilder();
     ArrayList<String> svrCommand = new ArrayList<>(processBuilderCommand);
-    svrCommand.add("/waterlooms/src/main/python/SVR.py");
+    svrCommand.add("/mstracer/src/main/python/SVR.py");
     svrCommand.add("-features");
     svrCommand.add(DOCKER_WORKING_DIR + rawFileName);
     processBuilder.command(svrCommand);
@@ -135,7 +135,7 @@ public class Main {
 
     // Step 4 : write to mzXMLFile_nn_score
     ArrayList<String> nnCommand = new ArrayList<>(processBuilderCommand);
-    nnCommand.add("/waterlooms/src/main/python/NN.py");
+    nnCommand.add("/mstracer/src/main/python/NN.py");
     nnCommand.add("-features");
     nnCommand.add(DOCKER_WORKING_DIR + rawFileName);
 
