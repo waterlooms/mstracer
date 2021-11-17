@@ -38,7 +38,7 @@ public class Main {
       processBuilderCommand.add("docker-compose");
       processBuilderCommand.add("exec");
       processBuilderCommand.add("-T");
-      processBuilderCommand.add("mstracer");
+      processBuilderCommand.add("waterlooms");
     }
     processBuilderCommand.add("python");
 
