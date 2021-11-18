@@ -32,7 +32,7 @@ class NN:
     with open(filepath + "_feature_one_z", 'r') as file:
       reader = csv.reader(file, delimiter='\t')
       test_data = list(reader)
-    path = "/waterlooms/src/main/python"
+    path = "/mstracer/src/main/python"
     X_nn = test_data[1: len(test_data)]
     #intensity_lst = np.empty(len(X_nn))
     features = [self.isonum, self.int_shape, self.iso_distr,

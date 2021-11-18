@@ -86,7 +86,7 @@ public class FeatureSelect {
     }
 
     // TODO: For each model_result row, save them into svrScores.
-    writeFile(workingDirectory + rawFileName + ".precursors", model_result, ml);
+    writeFile(workingDirectory + rawFileName + "_precursors.tsv", model_result, ml);
 
     return svrScores;
   }

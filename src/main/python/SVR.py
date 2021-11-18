@@ -42,7 +42,7 @@ class SVR:
             for j in range(0, len(X_svr[i])):
                 X_svr[i][j] = float(X_svr[i][j])
 
-        path = "/waterlooms/src/main/python" #TODO Finalize the pathing
+        path = "/mstracer/src/main/python" #TODO Finalize the pathing
         clf = pickle.load(open(path + "/model/SVR_z_selection", 'rb'))
         predict_svr = clf.predict(X_svr)
 
