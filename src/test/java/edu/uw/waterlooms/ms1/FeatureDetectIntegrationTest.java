@@ -27,7 +27,7 @@ public class FeatureDetectIntegrationTest {
         /* When */
         OpenMzxml openMzxml = new OpenMzxml(mzxmlFile);
         FeatureDetect featureDetect = new FeatureDetect(openMzxml, FeatureDetect.DetectionType.MS1);
-        MS1TrailDetect ms1TrailDetect = new MS1TrailDetect();
+//        MS1TrailDetect ms1TrailDetect = new MS1TrailDetect();
 
         /* Then */
 //        featureDetect.detectMS1Trails(mzxmlFile, rtNextPeakTolSec, mzTolerancePPMStrict, MIN_PEAKNUM_Strict, rtMaxRangeSec, intensityNextPeakPercentageTol);

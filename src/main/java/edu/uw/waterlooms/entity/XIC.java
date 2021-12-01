@@ -16,11 +16,8 @@ public class XIC implements Comparable<XIC>, Serializable {
   private int rowInMapAtMaxIntensity;
   private double peakSum;
   private double peakArea;
-  private ArrayList<Double> intensities;
-  private ArrayList<Double> massChargeRatios;
-  private ArrayList<Double> retentionTimes;
-  private ArrayList<Integer> columeInMap;
-  private ArrayList<Integer> rowInMap;
+  private double startRT;
+  private double endRT;
 
   /**
    * Lightweight constructor to allow for mz searching.
@@ -50,95 +47,37 @@ public class XIC implements Comparable<XIC>, Serializable {
    * @param rts ArrayList of retention times
    */
   public XIC(ArrayList<Double> ints, ArrayList<Double> mzs, ArrayList<Double> rts, ArrayList<Integer> columeInMap, ArrayList<Integer> rowInMap) {
-    this.intensities = ints;
-    this.massChargeRatios = mzs;
-    this.retentionTimes = rts;
-    this.columeInMap = columeInMap;
-    this.rowInMap = rowInMap;
     // Set the MZ, Intensity, and RetentionTime values at the maximum intensity of the trail
-    setLocalMaxValues();
-    quantify();
+    setLocalValues(ints, mzs, rts, columeInMap, rowInMap);
+    quantify(ints, rts);
   }
   /**
    * Helper function to compute the Maximum Intensity value and set the respective mz and rt fields.
    */
-  private void setLocalMaxValues() {
-    double maxIntensity = Collections.max(this.intensities);
-    int maxIntensityIdx = this.intensities.indexOf(maxIntensity);
+  private void setLocalValues(ArrayList<Double> ints, ArrayList<Double> mzs, ArrayList<Double> rts, ArrayList<Integer> columeInMap, ArrayList<Integer> rowInMap) {
+    double maxIntensity = Collections.max(ints);
+    int maxIntensityIdx = ints.indexOf(maxIntensity);
     this.maxIntensity = maxIntensity;
-    this.mzAtMaxIntensity = this.massChargeRatios.get(maxIntensityIdx);
-    this.rtAtMaxIntensity = this.retentionTimes.get(maxIntensityIdx);
-    this.columeInMapAtMaxIntensity = this.columeInMap.get(maxIntensityIdx);
-    this.rowInMapAtMaxIntensity = this.rowInMap.get(maxIntensityIdx);
+    this.mzAtMaxIntensity = mzs.get(maxIntensityIdx);
+    this.rtAtMaxIntensity = rts.get(maxIntensityIdx);
+    this.columeInMapAtMaxIntensity = columeInMap.get(maxIntensityIdx);
+    this.rowInMapAtMaxIntensity = rowInMap.get(maxIntensityIdx);
+    this.startRT = rts.get(0);
+    this.endRT = rts.get(rts.size() - 1);
   }
 
-  private void quantify(){
-    this.peakSum = this.intensities.get(0);
+  private void quantify(ArrayList<Double> ints, ArrayList<Double> rts){
+    this.peakSum = ints.get(0);
     this.peakArea = 0;
-    for (int i = 1; i < this.intensities.size(); i++) {
-      double intensity = this.intensities.get(i);
-      double prev_intensity = this.intensities.get(i-1);
-      double rt = this.retentionTimes.get(i);
-      double prev_rt = this.retentionTimes.get(i-1);
+    for (int i = 1; i < ints.size(); i++) {
+      double intensity = ints.get(i);
+      double prev_intensity = ints.get(i-1);
+      double rt = rts.get(i);
+      double prev_rt = rts.get(i-1);
       this.peakSum += intensity;
       this.peakArea += (intensity + prev_intensity) * (rt - prev_rt) / 2;
     }
   }
-
-  /**
-   * Getter for XIC/Trail intensities.
-   *
-   * @return ArrayList<Double>
-   */
-  public ArrayList<Double> getIntensities() {
-    return this.intensities;
-  }
-
-  /**
-   * Setter for XIC/Trail intensities.
-   *
-   * @param intensities ArrayList of intensities to set.
-   */
-  public void setIntensities(ArrayList<Double> intensities) {
-    this.intensities = intensities;
-  }
-
-  /**
-   * Getter for XIC/Trail mass-charge ratios.
-   *
-   * @return ArrayList<Double>
-   */
-  public ArrayList<Double> getMassChargeRatios() {
-    return this.massChargeRatios;
-  }
-
-  /**
-   * Setter for XIC/Trail mass-charge ratios.
-   *
-   * @param massChargeRatios ArrayList of m/z to set.
-   */
-  public void setMassChargeRatios(ArrayList<Double> massChargeRatios) {
-    this.massChargeRatios = massChargeRatios;
-  }
-
-  /**
-   * Getter for XIC/Trail retention times.
-   *
-   * @return ArrayList<Double>
-   */
-  public ArrayList<Double> getRetentionTimes() {
-    return this.retentionTimes;
-  }
-
-  /**
-   * Setter for XIC/Trail retention times.
-   *
-   * @param retentionTimes ArrayList of retention times to set.
-   */
-  public void setRetentionTimes(ArrayList<Double> retentionTimes) {
-    this.retentionTimes = retentionTimes;
-  }
-
   /**
    * Getter for RetentionTime at Max Intensity.
    *
@@ -155,6 +94,22 @@ public class XIC implements Comparable<XIC>, Serializable {
    */
   public void setRtAtMaxIntensity(double rtAtMaxIntensity) {
     this.rtAtMaxIntensity = rtAtMaxIntensity;
+  }
+
+  public double getStartRT() {
+    return startRT;
+  }
+
+  public void setStartRT(double startRT) {
+    this.startRT = startRT;
+  }
+
+  public double getEndRT() {
+    return endRT;
+  }
+
+  public void setEndRT(double endRT) {
+    this.endRT = endRT;
   }
 
   /**
@@ -199,14 +154,6 @@ public class XIC implements Comparable<XIC>, Serializable {
 
   public double getPeakArea() {
     return peakArea;
-  }
-
-  public double getStartRT() {
-    return retentionTimes.get(0);
-  }
-
-  public double getEndRT() {
-    return retentionTimes.get(retentionTimes.size()-1);
   }
 
   @Override

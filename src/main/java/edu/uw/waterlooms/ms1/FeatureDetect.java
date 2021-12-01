@@ -54,8 +54,6 @@ public class FeatureDetect {
   private ArrayList<XIC> MS1Trails;
 
   // TODO: refactor parameters
-  private int SEC_IN_MIN = 60;
-
   private double rtNextPeakTolMin = 0.1;  // 0.1min
   private double mzTolerancePPM = 10e-6; // 10ppm
   private int MIN_PEAKNUM = 2;
@@ -653,6 +651,10 @@ public class FeatureDetect {
         int size = scorePepAll.get(i).size();
         for (int j = 0; j < size; j++) {
           Integer id = i + 1;
+          Double startRT = MS1Trails.get(posInMS1Trail.get(i).get(j)).getStartRT();
+          Double endRT = MS1Trails.get(posInMS1Trail.get(i).get(j)).getEndRT();
+          Double peakSum = MS1Trails.get(posInMS1Trail.get(i).get(j)).getPeakSum();
+          Double peakArea = MS1Trails.get(posInMS1Trail.get(i).get(j)).getPeakArea();
           String data = "";
           data += id.toString();
           data += '\t' + scorePepAll.get(i).get(j).getR().toString();
@@ -662,10 +664,10 @@ public class FeatureDetect {
           data += '\t' + scoreIntShape.get(i).toString();
           data += '\t' + scoreIsoDistr.get(i).toString();
           data += '\t' + intensityPercentage.get(i).toString();
-          data += '\t' + MS1Trails.get(posInMS1Trail.get(i).get(j)).getStartRT();
-          data += '\t' + MS1Trails.get(posInMS1Trail.get(i).get(j)).getEndRT();
-          data += '\t' + MS1Trails.get(posInMS1Trail.get(i).get(j)).getPeakSum();
-          data += '\t' + MS1Trails.get(posInMS1Trail.get(i).get(j)).getPeakArea();
+          data += '\t' + startRT.toString();
+          data += '\t' + endRT.toString();
+          data += '\t' + peakSum.toString();
+          data += '\t' + peakArea.toString();
           data += '\n';
           printWriter.print(data);
         }
