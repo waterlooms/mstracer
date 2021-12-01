@@ -16,7 +16,7 @@ public class ParameterService {
   private static double MIN_REL_HEIGHT = 0.01;
   private static int INVALID_VAL = -1;
   private static double PERCENTAGE_OF_MAX = 0.5;
-  private static int INTENSITY_THRESHOLD = 10000;
+  private static int INTENSITY_THRESHOLD = 1;
   private static int Z_RANGE = 5;
   private static int WINDOW_SIZE = 4;
   private static double INTENSITY_BOUND = 1.5;

@@ -200,11 +200,10 @@ public class FeatureDetect {
           continue;
         }
         double prev_mz = mzMap[i][j];
-        double prev_rt = RT[i];
         double prev_intensity = intMap[i][j];
         boolean ifDecrease = false;
         double max_intensity = prev_intensity;
-        double max_peak_rt = prev_rt;
+        double max_peak_rt = RT[i];
         resultIndex = new ArrayList<>();
         resultIndex.add(new Pair<>(i, j));
         for (int k = i + 1; k < IDXRight; k++) {
@@ -218,16 +217,13 @@ public class FeatureDetect {
           double mz2 = mzMap[k][pos];
           double rt2 = RT[k];
           double intensity2 = intMap[k][pos];
-          if (intensity2 != InvalidVal
-                  && mz2 >= prev_mz * (1 - mzTolerancePPM)
-                  && mz2 <= prev_mz * (1 + mzTolerancePPM)) {
+          if (mz2 >= prev_mz * (1 - mzTolerancePPM) && mz2 <= prev_mz * (1 + mzTolerancePPM)) {
             if (intensity2 > prev_intensity && ifDecrease) {
               break;
             } else ifDecrease = intensity2 < prev_intensity * intensityNextPeakPercentageTol;
             prev_intensity = intensity2;
             resultIndex.add(new Pair<>(k, pos));
             prev_mz = mz2;
-            prev_rt = rt2;
             if (intensity2 > max_intensity) {
               max_intensity = intensity2;
               max_peak_rt = rt2;
