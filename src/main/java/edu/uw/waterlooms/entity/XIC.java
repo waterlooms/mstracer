@@ -14,10 +14,11 @@ public class XIC implements Comparable<XIC>, Serializable {
   private double maxIntensity;
   private int columeInMapAtMaxIntensity;
   private int rowInMapAtMaxIntensity;
+  private double peakSum;
+  private double peakArea;
   private ArrayList<Double> intensities;
   private ArrayList<Double> massChargeRatios;
   private ArrayList<Double> retentionTimes;
-  private double intensityLocalAreaPercentage;
   private ArrayList<Integer> columeInMap;
   private ArrayList<Integer> rowInMap;
 
@@ -48,25 +49,16 @@ public class XIC implements Comparable<XIC>, Serializable {
    * @param mzs ArrayList of mass-charge ratios
    * @param rts ArrayList of retention times
    */
-  public XIC(ArrayList<Double> ints, ArrayList<Double> mzs, ArrayList<Double> rts) {
+  public XIC(ArrayList<Double> ints, ArrayList<Double> mzs, ArrayList<Double> rts, ArrayList<Integer> columeInMap, ArrayList<Integer> rowInMap) {
     this.intensities = ints;
     this.massChargeRatios = mzs;
     this.retentionTimes = rts;
-    this.intensityLocalAreaPercentage = 0;
-
+    this.columeInMap = columeInMap;
+    this.rowInMap = rowInMap;
     // Set the MZ, Intensity, and RetentionTime values at the maximum intensity of the trail
     setLocalMaxValues();
+    quantify();
   }
-  public XIC(ArrayList<Double> ints, ArrayList<Double> mzs, ArrayList<Double> rts, double intensityLocalAreaPercentage) {
-    this.intensities = ints;
-    this.massChargeRatios = mzs;
-    this.retentionTimes = rts;
-    this.intensityLocalAreaPercentage = intensityLocalAreaPercentage;
-
-    // Set the MZ, Intensity, and RetentionTime values at the maximum intensity of the trail
-    setLocalMaxValues();
-  }
-
   /**
    * Helper function to compute the Maximum Intensity value and set the respective mz and rt fields.
    */
@@ -76,6 +68,21 @@ public class XIC implements Comparable<XIC>, Serializable {
     this.maxIntensity = maxIntensity;
     this.mzAtMaxIntensity = this.massChargeRatios.get(maxIntensityIdx);
     this.rtAtMaxIntensity = this.retentionTimes.get(maxIntensityIdx);
+    this.columeInMapAtMaxIntensity = this.columeInMap.get(maxIntensityIdx);
+    this.rowInMapAtMaxIntensity = this.rowInMap.get(maxIntensityIdx);
+  }
+
+  private void quantify(){
+    this.peakSum = this.intensities.get(0);
+    this.peakArea = 0;
+    for (int i = 1; i < this.intensities.size(); i++) {
+      double intensity = this.intensities.get(i);
+      double prev_intensity = this.intensities.get(i-1);
+      double rt = this.retentionTimes.get(i);
+      double prev_rt = this.retentionTimes.get(i-1);
+      this.peakSum += intensity;
+      this.peakArea += (intensity + prev_intensity) * (rt - prev_rt) / 2;
+    }
   }
 
   /**
@@ -186,18 +193,21 @@ public class XIC implements Comparable<XIC>, Serializable {
     this.maxIntensity = maxIntensity;
   }
 
-  
-  /*
-  @Override
-  public int compareTo(XIC xic) {
-    if (this.mzAtMaxIntensity > xic.mzAtMaxIntensity + 0.005) {
-      return 1;
-    }
-    if (this.mzAtMaxIntensity < xic.mzAtMaxIntensity - 0.005) {
-      return -1;
-    }
-    return 0;
-  }**/
+  public double getPeakSum() {
+    return peakSum;
+  }
+
+  public double getPeakArea() {
+    return peakArea;
+  }
+
+  public double getStartRT() {
+    return retentionTimes.get(0);
+  }
+
+  public double getEndRT() {
+    return retentionTimes.get(retentionTimes.size()-1);
+  }
 
   @Override
   public int compareTo(XIC xic){

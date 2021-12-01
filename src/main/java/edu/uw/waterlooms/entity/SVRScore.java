@@ -8,17 +8,13 @@ public class SVRScore {
   private double isotopeNumber;
   private double intensityShapeScore;
   private double isotopeDistributionScore;
-  private double intensityWindowAverage;
   private double intensityAreaPercentage;
   private double retentionTimeStart;
   private double retentionTimeEnd;
-  private double scanNum;
-  private double intensitySum;
+  private double peaksSum;
+  private double peaksArea;
   private double svrScore;
   private double qualityScore;
-  private double mz1, mz2, mz3, mz4;
-  private double int1, int2, int3, int4;
-  private double rt1, rt2, rt3, rt4;
   /**
    * Constructor for the model_result object returned from FeatureSelect.java. Represents a single precursor detected.
    *
@@ -46,12 +42,11 @@ public class SVRScore {
       double isotopeNumber,
       double intensityShapeScore,
       double isotopeDistributionScore,
-      double intensityWindowAverage,
       double intensityAreaPercentage,
       double retentionTimeStart,
       double retentionTimeEnd,
-      double scanNum,
-      double intensitySum,
+      double peaksArea,
+      double peaksSum,
       double svrScore,
       double qualityScore) {
     this.id = id;
@@ -61,12 +56,11 @@ public class SVRScore {
     this.isotopeNumber = isotopeNumber;
     this.intensityShapeScore = intensityShapeScore;
     this.isotopeDistributionScore = isotopeDistributionScore;
-    this.intensityWindowAverage = intensityWindowAverage;
     this.intensityAreaPercentage = intensityAreaPercentage;
     this.retentionTimeStart = retentionTimeStart;
     this.retentionTimeEnd = retentionTimeEnd;
-    this.scanNum = scanNum;
-    this.intensitySum = intensitySum;
+    this.peaksSum = peaksSum;
+    this.peaksArea = peaksArea;
     this.svrScore = svrScore;
     this.qualityScore = qualityScore;
   }
@@ -127,14 +121,6 @@ public class SVRScore {
     this.isotopeDistributionScore = isotopeDistributionScore;
   }
 
-  public double getIntensityWindowAverage() {
-    return intensityWindowAverage;
-  }
-
-  public void setIntensityWindowAverage(double intensityWindowAverage) {
-    this.intensityWindowAverage = intensityWindowAverage;
-  }
-
   public double getIntensityAreaPercentage() {
     return intensityAreaPercentage;
   }
@@ -157,22 +143,6 @@ public class SVRScore {
 
   public void setRetentionTimeEnd(double retentionTimeEnd) {
     this.retentionTimeEnd = retentionTimeEnd;
-  }
-
-  public double getScanNum() {
-    return scanNum;
-  }
-
-  public void setScanNum(double scanNum) {
-    this.scanNum = scanNum;
-  }
-
-  public double getIntensitySum() {
-    return intensitySum;
-  }
-
-  public void setIntensitySum(double intensitySum) {
-    this.intensitySum = intensitySum;
   }
 
   public double getSvrScore() {

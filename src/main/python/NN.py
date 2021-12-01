@@ -19,13 +19,12 @@ class NN:
     self.isonum = 4
     self.int_shape = 5
     self.iso_distr = 6
-    self.intensity_window_avg = 7
-    self.intensity_area_percentage = 8
-    self.rt_start = 9
-    self.rt_end = 10
-    self.scan_num = 11
-    self.intensity_sum = 12
-    self.svr = 13
+    self.intensity_area_percentage = 7
+    self.rt_start = 8
+    self.rt_end = 9
+    self.quantification_peaks_sum = 10
+    self.quantification_peaks_area = 11
+    self.svr = 12
 
   def run(self, feature_file):
     filepath = feature_file
@@ -53,7 +52,7 @@ class NN:
     predict_nn = NN.get_prediction(X_nn, path + "/model/NN_feature_rank")
     with open(filepath + "_nn_score", "w+") as outfile:
       outfile.write(
-        "id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_window_avg\tintensity_intensity_area_percentage\trt_start\trt_end\tscan_num\tintensity_sum\tSVRscore\tquality_score\n")
+        "id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\trt_start\trt_end\tquantification_peaks_sum\tquantification_peaks_area\tSVRscore\tquality_score\n")
       for i in range(len(X_nn)):
         outfile.write("%s\t" % test_data[i + 1][self.ID])
         outfile.write("%s\t" % test_data[i + 1][self.mz])
@@ -63,12 +62,11 @@ class NN:
         outfile.write("%s\t" % test_data[i + 1][self.int_shape])
         outfile.write("%s\t" % test_data[i + 1][self.iso_distr])
         #test_data[i + 1][self.intensity_window_avg] *= scale_int
-        outfile.write("%s\t" % test_data[i + 1][self.intensity_window_avg])
         outfile.write("%s\t" % test_data[i + 1][self.intensity_area_percentage])
         outfile.write("%s\t" % test_data[i + 1][self.rt_start])
         outfile.write("%s\t" % test_data[i + 1][self.rt_end])
-        outfile.write("%s\t" % test_data[i + 1][self.scan_num])
-        outfile.write("%s\t" % test_data[i + 1][self.intensity_sum])
+        outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_sum])
+        outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_area])
         outfile.write("%s\t" % test_data[i + 1][self.svr])
         outfile.write("%f\n" % predict_nn[i])
     print("Done!")

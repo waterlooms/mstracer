@@ -77,7 +77,7 @@ public class Main {
     String serializedParameters = ns.getString("parameters");
 
     //String rawFileName = "r01_dia_data.mzXML";
-    String rawFileName = "toy.mzXML";
+    String rawFileName = "Human-Protein-Training_Trypsin.mzXML";
     if ((mzXMLInFile != null && !mzXMLInFile.isEmpty())){
       // TODO: DIA-WEBAPP submits mzXMLInFile as a path/file.mzXML
       // TODO: Need to strip this and set rawFileName

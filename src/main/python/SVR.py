@@ -19,12 +19,11 @@ class SVR:
         self.isonum = 4
         self.int_shape = 5
         self.iso_distr = 6
-        self.intensity_window_avg = 7
-        self.intensity_area_percentage = 8
-        self.rt_start = 9
-        self.rt_end = 10
-        self.scan_num = 11
-        self.intensity_sum = 12
+        self.intensity_area_percentage = 7
+        self.rt_start = 8
+        self.rt_end = 9
+        self.quantification_peaks_sum = 10
+        self.quantification_peaks_area = 11
 
     # TO-DO: change to run(self, feature_file, parameter_dict)
     def run(self, feature_file):
@@ -47,7 +46,7 @@ class SVR:
         predict_svr = clf.predict(X_svr)
 
         with open(filepath + "_svr_score", "w+") as outfile:
-            outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_intensity_window_avg\tintensity_intensity_area_percentage\trt_start\trt_end\tscan_num\tintensity_sum\tSVRscore\n")
+            outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\trt_start\trt_end\tquantification_peaks_sum\tquantification_peaks_area\tSVRscore\n")
             for i in range(len(X_svr)):
                 outfile.write("%s\t" % test_data[i + 1][self.ID])
                 outfile.write("%s\t" % test_data[i + 1][self.mz])
@@ -56,12 +55,11 @@ class SVR:
                 outfile.write("%s\t" % test_data[i + 1][self.isonum])
                 outfile.write("%s\t" % test_data[i + 1][self.int_shape])
                 outfile.write("%s\t" % test_data[i + 1][self.iso_distr])
-                outfile.write("%s\t" % test_data[i + 1][self.intensity_window_avg])
                 outfile.write("%s\t" % test_data[i + 1][self.intensity_area_percentage])
                 outfile.write("%s\t" % test_data[i + 1][self.rt_start])
                 outfile.write("%s\t" % test_data[i + 1][self.rt_end])
-                outfile.write("%s\t" % test_data[i + 1][self.scan_num])
-                outfile.write("%s\t" % test_data[i + 1][self.intensity_sum])
+                outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_sum])
+                outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_area])
                 outfile.write("%f\n" % predict_svr[i])
         print("Done!")
 
