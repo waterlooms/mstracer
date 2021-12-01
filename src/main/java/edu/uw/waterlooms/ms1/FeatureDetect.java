@@ -10,6 +10,7 @@ import edu.uw.waterlooms.service.ParameterService;
 import umich.ms.datatypes.scan.IScan;
 import umich.ms.datatypes.spectrum.ISpectrum;
 import umich.ms.fileio.exceptions.FileParsingException;
+import org.apache.commons.io.FilenameUtils;
 
 public class FeatureDetect {
   public enum DetectionType {
@@ -94,9 +95,10 @@ public class FeatureDetect {
     calculateIsoDistributionScore();
     System.out.println("calculateIsoDistributionScore completed");
     try {
+      String newFilePath = filepath.replaceFirst("[.][^.]+$", "");
       writeFeatures(
-              filepath
-                      + "_feature_all_z"); // since a feature is searched with all possible charge states
+              newFilePath
+                      + "_featureAllZ.tsv"); // since a feature is searched with all possible charge states
     } catch (IOException e) {
       System.out.println("Write to file failed.");
     }
@@ -635,8 +637,8 @@ public class FeatureDetect {
               + '\t'
               + "isotope_distribution_score"
               + '\t'
-                  + "intensity_percentage"
-                  + '\t'
+              + "intensity_percentage"
+              + '\t'
               + "rt_start"
               + '\t'
               + "rt_end"

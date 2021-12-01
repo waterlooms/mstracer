@@ -35,29 +35,29 @@ public class FeatureSelect {
   /**
    * Select charge state based on SVR score; one charge state of a feature
    *
-   * @param filepath file path without defined suffix
+   * @param oldFilePath file path with defined suffix
    * @throws IOException
    */
-  public void selectFeature(String filepath) throws IOException {
+  public void selectFeature(String oldFilePath) throws IOException {
     setParameters();
     ML ml = ML.SVR;
-    model_result = readFile(filepath + "_svr_score");
+    String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
+    model_result = readFile(filepath + "_SVRScore.tsv");
     selectCharge();
     model_result = removeIso(model_result);
-    writeFile(filepath + "_feature_one_z", model_result, ml);
+    writeFile(filepath + "_featureOneZ.tsv", model_result, ml);
   }
   /**
    * Generate the final feature list; last step
    *
-   * @param oldFilePath file path without defined suffix TODO: Refactor this
-   * @param workingDirectory String containing the working directory
-   * @param rawFileName String containing the name of the MSConvert mzXML file (converted from RAW)
+   * @param oldFilePath file path with defined suffix
    * @throws IOException
    */
-  public List<SVRScore> finalizeFeature(String oldFilePath, String workingDirectory, String rawFileName) throws IOException {
+  public List<SVRScore> finalizeFeature(String oldFilePath) throws IOException {
     setParameters();
     ML ml = ML.NN;
-    model_result = readFile(oldFilePath + "_nn_score");
+    String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
+    model_result = readFile(filepath + "_NNScore.tsv");
     model_result = clusterFeature(model_result, mz_error, rt_error);
     model_result.sort(Comparator.comparing(l -> l[quality_index]));
     Collections.reverse(model_result);
@@ -82,9 +82,7 @@ public class FeatureSelect {
               element[13]);
       svrScores.add(ms1Precursor);
     }
-
-    // TODO: For each model_result row, save them into svrScores.
-    writeFile(workingDirectory + rawFileName + ".precursors", model_result, ml);
+    writeFile(filepath + "_precursors.tsv", model_result, ml);
 
     return svrScores;
   }
@@ -318,17 +316,15 @@ public class FeatureSelect {
               + '\t'
               + "isotope_distribution_score"
               + '\t'
-              + "intensity_window_evg"
-              + '\t'
               + "intensity_area_percentage"
               + '\t'
               + "rt_start"
               + '\t'
               + "rt_end"
               + '\t'
-              + "scan_num"
+              + "quantification_peaks_sum"
               + '\t'
-              + "intensity_sum"
+              + "quantification_peaks_area"
               + '\t'
               + "svr_score"
               + nn_title

@@ -77,7 +77,7 @@ public class Main {
     String serializedParameters = ns.getString("parameters");
 
     //String rawFileName = "r01_dia_data.mzXML";
-    String rawFileName = "Human-Protein-Training_Trypsin.mzXML";
+    String rawFileName = "toy.mzXML";
     if ((mzXMLInFile != null && !mzXMLInFile.isEmpty())){
       // TODO: DIA-WEBAPP submits mzXMLInFile as a path/file.mzXML
       // TODO: Need to strip this and set rawFileName
@@ -116,7 +116,7 @@ public class Main {
     ArrayList<String> svrCommand = new ArrayList<>(processBuilderCommand);
     svrCommand.add("/mstracer/src/main/python/SVR.py");
     svrCommand.add("-features");
-    svrCommand.add(DOCKER_WORKING_DIR + rawFileName);
+    svrCommand.add(mzXMLFile);
     processBuilder.command(svrCommand);
     try {
       // TODO: Suppress output if necessary for python
@@ -131,13 +131,13 @@ public class Main {
     System.out.println("Selecting charge with FeatureSelect ...");
     FeatureSelect featureSelect = new FeatureSelect();
     featureSelect.selectFeature(
-            LOCAL_WORKING_DIR + rawFileName);
+            mzXMLFile);
 
     // Step 4 : write to mzXMLFile_nn_score
     ArrayList<String> nnCommand = new ArrayList<>(processBuilderCommand);
     nnCommand.add("/mstracer/src/main/python/NN.py");
     nnCommand.add("-features");
-    nnCommand.add(DOCKER_WORKING_DIR + rawFileName);
+    nnCommand.add(mzXMLFile);
 
     processBuilder.command(nnCommand);
     try {
@@ -153,8 +153,7 @@ public class Main {
     List<SVRScore> svrScores;
     svrScores =
             featureSelect.finalizeFeature(
-                    LOCAL_WORKING_DIR + rawFileName,
-                    LOCAL_WORKING_DIR, rawFileName
+                    mzXMLFile
             );
     System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "...");
 

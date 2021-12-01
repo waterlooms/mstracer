@@ -5,7 +5,8 @@
 import csv
 import pickle
 import sys
-sys.path.append("/waterlooms/src/main/python") #TODO Possibly remove this
+import os
+sys.path.append("/mstracer/src/main/python") #TODO Possibly remove this
 
 import argparse
 
@@ -29,8 +30,8 @@ class SVR:
     def run(self, feature_file):
         start = self.isonum
         end = self.iso_distr
-        filepath = feature_file
-        with open(filepath + "_feature_all_z", 'r') as file:
+        filepath = os.path.splitext(feature_file)[0]
+        with open(filepath + "_featureAllZ.tsv", 'r') as file:
             reader = csv.reader(file, delimiter='\t')
             test_data = list(reader)
         X_svr = test_data[1: len(test_data)]  # jump header
@@ -41,11 +42,11 @@ class SVR:
             for j in range(0, len(X_svr[i])):
                 X_svr[i][j] = float(X_svr[i][j])
 
-        path = "/waterlooms/src/main/python" #TODO Finalize the pathing
+        path = "/mstracer/src/main/python" #TODO Finalize the pathing
         clf = pickle.load(open(path + "/model/SVR_z_selection", 'rb'))
         predict_svr = clf.predict(X_svr)
 
-        with open(filepath + "_svr_score", "w+") as outfile:
+        with open(filepath + "_SVRScore.tsv", "w+") as outfile:
             outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\trt_start\trt_end\tquantification_peaks_sum\tquantification_peaks_area\tSVRscore\n")
             for i in range(len(X_svr)):
                 outfile.write("%s\t" % test_data[i + 1][self.ID])

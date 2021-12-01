@@ -7,7 +7,7 @@ from tensorflow import keras
 import numpy as np
 import csv
 import math
-
+import os
 
 class NN:
   def __init__(self):
@@ -27,30 +27,26 @@ class NN:
     self.svr = 12
 
   def run(self, feature_file):
-    filepath = feature_file
-    with open(filepath + "_feature_one_z", 'r') as file:
+    filepath = os.path.splitext(feature_file)[0]
+    with open(filepath + "_featureOneZ.tsv", 'r') as file:
       reader = csv.reader(file, delimiter='\t')
       test_data = list(reader)
-    path = "/waterlooms/src/main/python"
+    path = "/mstracer/src/main/python"
     X_nn = test_data[1: len(test_data)]
-    #intensity_lst = np.empty(len(X_nn))
     features = [self.isonum, self.int_shape, self.iso_distr,
                 self.intensity_area_percentage]
     for i in range(0, len(X_nn)):
       for j in range(0, len(X_nn[i])):
         X_nn[i][j] = float(X_nn[i][j])
-      #intensity_lst[i] = X_nn[i][self.intensity_sum]
-    #np.sort(intensity_lst)
-    #scale_int = intensity_lst[99]
+
     for i in range(0, len(X_nn)):
-      #X_nn[i][self.intensity_sum] /= scale_int
       arr = [0] * len(features)
       for j in range(0, len(features)):
         arr[j] = X_nn[i][features[j]]
       X_nn[i] = arr
     X_nn = np.array(X_nn)
     predict_nn = NN.get_prediction(X_nn, path + "/model/NN_feature_rank")
-    with open(filepath + "_nn_score", "w+") as outfile:
+    with open(filepath + "_NNScore.tsv", "w+") as outfile:
       outfile.write(
         "id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\trt_start\trt_end\tquantification_peaks_sum\tquantification_peaks_area\tSVRscore\tquality_score\n")
       for i in range(len(X_nn)):
