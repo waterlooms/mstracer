@@ -19,6 +19,7 @@ public class FeatureSelect {
   private int intensity_area_percentage_index;
   private int rt_start_index;
   private int rt_end_index;
+  private int scan_num_index;
   private int quantification_peaks_sum_index;
   private int quantification_peaks_area_index;
   private int svr_index;
@@ -79,7 +80,9 @@ public class FeatureSelect {
               element[10],
               element[11],
               element[12],
-              element[13]);
+              element[13],
+              element[14]
+          );
       svrScores.add(ms1Precursor);
     }
     writeFile(filepath + "_precursors.tsv", model_result, ml);
@@ -102,6 +105,7 @@ public class FeatureSelect {
     intensity_area_percentage_index = ParameterService.getIntensityAreaPercentageIndex();
     rt_start_index = ParameterService.getRtStartIndex();
     rt_end_index = ParameterService.getRtEndIndex();
+    scan_num_index = ParameterService.getScanSumIndex();
     quantification_peaks_sum_index = ParameterService.getPeaksSumIndex();
     quantification_peaks_area_index = ParameterService.getPeaksAreaIndex();
     svr_index = ParameterService.getSvrIndex();
@@ -322,6 +326,8 @@ public class FeatureSelect {
               + '\t'
               + "rt_end"
               + '\t'
+              + "scan_num"
+              + '\t'
               + "quantification_peaks_sum"
               + '\t'
               + "quantification_peaks_area"
@@ -347,6 +353,7 @@ public class FeatureSelect {
           data += '\t' + list.get(i + j)[intensity_area_percentage_index].toString();
           data += '\t' + list.get(i + j)[rt_start_index].toString();
           data += '\t' + list.get(i + j)[rt_end_index].toString();
+          data += '\t' + list.get(i + j)[scan_num_index].toString();
           data += '\t' + list.get(i + j)[quantification_peaks_sum_index].toString();
           data += '\t' + list.get(i + j)[quantification_peaks_area_index].toString();
           data += '\t' + list.get(i + j)[svr_index].toString();
