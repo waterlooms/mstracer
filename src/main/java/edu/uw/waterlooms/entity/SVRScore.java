@@ -11,6 +11,7 @@ public class SVRScore {
   private double intensityAreaPercentage;
   private double retentionTimeStart;
   private double retentionTimeEnd;
+  private double scanNum;
   private double peaksSum;
   private double peaksArea;
   private double svrScore;
@@ -25,12 +26,10 @@ public class SVRScore {
    * @param isotopeNumber
    * @param intensityShapeScore
    * @param isotopeDistributionScore
-   * @param intensityWindowAverage
    * @param intensityAreaPercentage
    * @param retentionTimeStart
    * @param retentionTimeEnd
    * @param scanNum
-   * @param intensitySum
    * @param svrScore
    * @param qualityScore
    */
@@ -45,6 +44,7 @@ public class SVRScore {
       double intensityAreaPercentage,
       double retentionTimeStart,
       double retentionTimeEnd,
+      double scanNum,
       double peaksArea,
       double peaksSum,
       double svrScore,
@@ -59,6 +59,7 @@ public class SVRScore {
     this.intensityAreaPercentage = intensityAreaPercentage;
     this.retentionTimeStart = retentionTimeStart;
     this.retentionTimeEnd = retentionTimeEnd;
+    this.scanNum = scanNum;
     this.peaksSum = peaksSum;
     this.peaksArea = peaksArea;
     this.svrScore = svrScore;

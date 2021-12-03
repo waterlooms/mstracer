@@ -22,9 +22,10 @@ class NN:
     self.intensity_area_percentage = 7
     self.rt_start = 8
     self.rt_end = 9
-    self.quantification_peaks_sum = 10
-    self.quantification_peaks_area = 11
-    self.svr = 12
+    self.scan_num = 10
+    self.quantification_peaks_sum = 11
+    self.quantification_peaks_area = 12
+    self.svr = 13
 
   def run(self, feature_file):
     filepath = os.path.splitext(feature_file)[0]
@@ -48,7 +49,7 @@ class NN:
     predict_nn = NN.get_prediction(X_nn, path + "/model/NN_feature_rank")
     with open(filepath + "_NNScore.tsv", "w+") as outfile:
       outfile.write(
-        "id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\trt_start\trt_end\tquantification_peaks_sum\tquantification_peaks_area\tSVRscore\tquality_score\n")
+        "id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\trt_start\trt_end\tscan_num\tquantification_peaks_sum\tquantification_peaks_area\tSVRscore\tquality_score\n")
       for i in range(len(X_nn)):
         outfile.write("%s\t" % test_data[i + 1][self.ID])
         outfile.write("%s\t" % test_data[i + 1][self.mz])
@@ -61,6 +62,7 @@ class NN:
         outfile.write("%s\t" % test_data[i + 1][self.intensity_area_percentage])
         outfile.write("%s\t" % test_data[i + 1][self.rt_start])
         outfile.write("%s\t" % test_data[i + 1][self.rt_end])
+        outfile.write("%s\t" % test_data[i + 1][self.scan_num])
         outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_sum])
         outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_area])
         outfile.write("%s\t" % test_data[i + 1][self.svr])

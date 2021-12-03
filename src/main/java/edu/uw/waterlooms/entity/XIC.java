@@ -7,8 +7,6 @@ import java.util.Collections;
 
 
 public class XIC implements Comparable<XIC>, Serializable {
-  final double RT_MARGIN = 0.0000001;
-
   private double rtAtMaxIntensity;
   private double mzAtMaxIntensity;
   private double maxIntensity;
@@ -50,6 +48,18 @@ public class XIC implements Comparable<XIC>, Serializable {
     // Set the MZ, Intensity, and RetentionTime values at the maximum intensity of the trail
     setLocalValues(ints, mzs, rts, columeInMap, rowInMap);
     quantify(ints, rts);
+  }
+
+  public XIC(double mz, double rt, double intensity, int colume, int row, double startRT, double endRT, double peakSum, double peakArea) {
+    this.mzAtMaxIntensity = mz;
+    this.rtAtMaxIntensity = rt;
+    this.maxIntensity = intensity;
+    this.columeInMapAtMaxIntensity = colume;
+    this.rowInMapAtMaxIntensity = row;
+    this.startRT = startRT;
+    this.endRT = endRT;
+    this.peakArea = peakArea;
+    this.peakSum = peakSum;
   }
   /**
    * Helper function to compute the Maximum Intensity value and set the respective mz and rt fields.

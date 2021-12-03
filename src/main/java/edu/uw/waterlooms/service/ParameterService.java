@@ -32,10 +32,11 @@ public class ParameterService {
   private static final int INTENSITY_AREA_PERCENTAGE_INDEX = 7;
   private static final int RT_START_INDEX = 8;
   private static final int RT_END_INDEX = 9;
-  private static final int PEAKS_SUM_INDEX = 10;
-  private static final int PEAKS_AREA_INDEX = 11;
-  private static final int SVR_INDEX = 12;
-  private static final int QUALITY_INDEX = 13;
+  private static final int SCAN_SUM_INDEX = 10;
+  private static final int PEAKS_SUM_INDEX = 11;
+  private static final int PEAKS_AREA_INDEX = 12;
+  private static final int SVR_INDEX = 13;
+  private static final int QUALITY_INDEX = 14;
   private static double MZ_ERROR = 0.000008;
   private static double RT_ERROR = 0.5;
 
@@ -193,6 +194,8 @@ public class ParameterService {
   public static int getRtEndIndex() {
     return RT_END_INDEX;
   }
+
+  public static int getScanSumIndex() { return SCAN_SUM_INDEX; }
 
   public static int getPeaksSumIndex() {
     return PEAKS_SUM_INDEX;
