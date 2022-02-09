@@ -52,24 +52,8 @@ public class FeatureDetect {
   private List<List<Double>> intCluster;
   private List<Double> intSum;
   private List<Double> intensityPercentage;
-  private List<List<Double>> rtStart;
-  private List<List<Double>> rtEnd;
-  private List<List<Integer>> scanNum;
-  private List<List<Double>>  quantificationPeaksSum;
-  private List<List<Double>>  quantificationPeaksArea;
-  private ArrayList<XIC> MS1Trails;
+  private List<List<XIC>> trailsAll;
 
-  // MS2 params
-  // TODO: refactor parameters
-  private int SEC_IN_MIN = 60;
-  private int MZ_INDEX = 0;
-  private int RT_INDEX = 1;
-  private int INTENSITY_INDEX = 2;
-  private int IFOCCUPIED_INDEX = 3;
-  private int COL_INDEX = 4;
-  private int ROW_INDEX = 5;
-  private double UNOCCUPIED = 0.0;
-  private double OCCUPIED = 1.0;
   /**
    * Read in all mzXML file information
    *
@@ -116,14 +100,12 @@ public class FeatureDetect {
     init_MS1();
     findLocalMax();
     System.out.println("findLocalMax completed");
-//    getLocalMaxFromMS1Trails();
-//    System.out.println("getLocalMaxFromMS1Trails completed");
     searchIsotope(window_size, z_range);
     System.out.println("searchIsotope completed");
     isoDistributionScore();
     System.out.println("isoDistributionScore completed");
-    searchProperty();
-    System.out.println("searchProperty completed");
+    detectTrailofPrecursor();
+    System.out.println("detectTrailofPrecursor completed");
     try {
       writeFeatures(
               filepath
@@ -198,197 +180,6 @@ public class FeatureDetect {
     }
     System.out.println("window_size: " + window_size);
     System.out.println("z_range: " + z_range);
-  }
-
-  private void getLocalMaxFromMS1Trails() {
-    int rtNextPeakTolSec = 5;  // 5sec
-    double mzTolerancePPMStrict = 10e-6; // 10ppm
-    int MIN_PEAKNUM_Strict = 2;
-    double rtMaxRangeSec = 30; // 30sec
-    double intensityNextPeakPercentageTol = 0.9; // 90%
-
-    detectMS1Trails(rtNextPeakTolSec, mzTolerancePPMStrict, MIN_PEAKNUM_Strict, rtMaxRangeSec, intensityNextPeakPercentageTol);
-
-    localpepMax = new List[IDX];
-    for(int i = 0; i < IDX; i++){
-      localpepMax[i] = new ArrayList<>();
-    }
-    for (XIC trail: MS1Trails) {
-      int column = trail.getColumeInMapAtMaxIntensity();
-      int row = trail.getRowInMapAtMaxIntensity();
-      localpepMax[column].add(row);
-    }
-    for (int i = 0; i < IDX; i++) {
-      Collections.sort(localpepMax[i]);
-    }
-  }
-
-  public void detectMS1Trails(double rtNextPeakTolSec,  double mzTolerancePPMStrict, int MIN_PEAKNUM_Strict, double rtMaxRangeSec, double intensityNextPeakPercentageTol){
-    double  rtNextPeakTolMin = rtNextPeakTolSec/SEC_IN_MIN;
-    double rtMaxRangeMin = rtMaxRangeSec/SEC_IN_MIN;
-
-    int col = 0;
-    ArrayList<Double[]> ms1InfoMap = new ArrayList<>();
-    for (Map.Entry<Integer, IScan> scanEntry : scanEntries) {
-      IScan scan = scanEntry.getValue();
-      ISpectrum spectrum = null;
-      try {
-        spectrum = scan.fetchSpectrum();
-      } catch (FileParsingException e) {
-        e.printStackTrace();
-      }
-      double rt = scan.getRt();
-      double[] mzs = spectrum.getMZs();
-      double[] ints = spectrum.getIntensities();
-
-      System.out.println(rt);
-
-      for (int p = 0; p < mzs.length; p++) {
-        Double[] ms1Info = new Double[6];
-        ms1Info[MZ_INDEX] = mzs[p];
-        ms1Info[RT_INDEX] = rt;
-        ms1Info[INTENSITY_INDEX] = ints[p];
-        ms1Info[IFOCCUPIED_INDEX] = UNOCCUPIED;
-        ms1Info[COL_INDEX] = (double)col;
-        ms1Info[ROW_INDEX] = (double)p;
-        ms1InfoMap.add(ms1Info);
-      }
-      col++;
-    }
-    MS1Trails = searchInfoList_method2(ms1InfoMap, rtNextPeakTolMin, mzTolerancePPMStrict, MIN_PEAKNUM_Strict, rtMaxRangeMin, intensityNextPeakPercentageTol);
-  }
-
-  private ArrayList<XIC> searchInfoList_method2(ArrayList<Double[]> infoList, double rtNextPeakTol, double mzTolerancePPM, int MIN_PEAKNUM_Strict,  double rtMaxRange, double intensityNextPeakPercentageTol) {
-    ArrayList<XIC> trails = new ArrayList<>();
-    infoList.sort(Comparator.comparing(l -> l[MZ_INDEX])); // sort by MZ
-    infoList.sort(Comparator.comparing(l -> l[RT_INDEX])); // sort by RT, sorting is in ascending order of RT value.
-    ArrayList<Pair<Integer, Double>> resultIndex; // A list of <index, rt> wrt the XIC.
-    int long_trail_num = 0;
-    int j;
-    for (int i = 0; i < infoList.size();i++) { // Start the search from one peak (m/z smallest, this should not matter).
-      if (infoList.get(i)[IFOCCUPIED_INDEX] == OCCUPIED) {
-        continue; // Skip to the next if current is already in another group.
-      }
-      double prev_mz =  infoList.get(i)[MZ_INDEX];
-      double prev_rt = infoList.get(i)[RT_INDEX];
-      double prev_intensity = infoList.get(i)[INTENSITY_INDEX];
-      boolean ifDecrease = false;
-      double max_intensity = prev_intensity;
-      double max_peak_rt = prev_rt;
-      resultIndex = new ArrayList<>();
-      resultIndex.add(new Pair<>(i, prev_rt));
-      if (i % 10000 == 0) {
-        System.out.println("Progress: " + i + "/" + infoList.size());
-      }
-      j = i + 1;
-      while (j < infoList.size() && infoList.get(j)[IFOCCUPIED_INDEX] == OCCUPIED) {
-        j++;
-      }
-      if (j == infoList.size()) {
-        break;
-      }
-      for (; j < infoList.size(); j++) { // Continue the search from the next peak.
-        double mz2 = infoList.get(j)[MZ_INDEX];
-        double rt2 = infoList.get(j)[RT_INDEX];
-        double intensity2 = infoList.get(j)[INTENSITY_INDEX];
-        if (rt2 > prev_rt + rtNextPeakTol || rt2 > max_peak_rt + rtMaxRange / 2) {
-          break;
-        }
-        if (infoList.get(j)[IFOCCUPIED_INDEX] == UNOCCUPIED
-                && mz2 >= prev_mz * (1 - mzTolerancePPM)
-                && mz2 <= prev_mz * (1 + mzTolerancePPM)
-                && rt2 <= prev_rt + rtNextPeakTol
-                && rt2 > prev_rt){
-          if (intensity2 > prev_intensity && ifDecrease) {
-            break;
-          } else ifDecrease = intensity2 < prev_intensity * intensityNextPeakPercentageTol;
-          prev_intensity = intensity2;
-          resultIndex.add(new Pair<>(j, rt2));
-          prev_mz = mz2;
-          prev_rt = rt2;
-          if (intensity2 > max_intensity) {
-            max_intensity = intensity2;
-            max_peak_rt = rt2;
-          }
-        }
-      }
-      // Make sure the left side is within rtMaxRange
-      int k = 0;
-      if (resultIndex.get(resultIndex.size()-1).getR() - resultIndex.get(0).getR() > rtMaxRange) {
-        for (; k < resultIndex.size(); k++) {
-          if (max_peak_rt - resultIndex.get(k).getR() < rtMaxRange / 2 ) {
-            break;
-          }
-        }
-      }
-      // Must contain at least MIN_PEAKNUM_Strict peaks
-      if (resultIndex.size() - k < MIN_PEAKNUM_Strict) {
-        continue;
-      }
-      // Compute the number of long trails
-      if (resultIndex.size() - k > 20) {
-        long_trail_num++;
-      }
-      // Add XIC trail
-      ArrayList<Double> rts = new ArrayList<>();
-      ArrayList<Double> ints = new ArrayList<>();
-      ArrayList<Integer> cols = new ArrayList<>();
-      ArrayList<Integer> rows = new ArrayList<>();
-      for (int x = k; x < resultIndex.size(); x++) { // Add to trails
-        Pair<Integer, Double> item = resultIndex.get(x);
-        int id = item.getL();
-        rts.add(infoList.get(id)[RT_INDEX]);
-        ints.add(infoList.get(id)[INTENSITY_INDEX]);
-        cols.add(infoList.get(id)[COL_INDEX].intValue());
-        rows.add(infoList.get(id)[ROW_INDEX].intValue());
-        infoList.get(id)[IFOCCUPIED_INDEX] = OCCUPIED;
-      }
-      double maxIntensity = Collections.max(ints);
-      int maxIntensityIdx = ints.indexOf(maxIntensity);
-      int maxColumeIdx = cols.get(maxIntensityIdx);
-      int maxRowIdx = rows.get(maxIntensityIdx);
-      double mzAtMaxIntensity = mzMap[maxColumeIdx][maxRowIdx];
-      double rtAtMaxIntensity = RT[maxColumeIdx];
-      double startRT = infoList.get(0)[INTENSITY_INDEX];
-      double endRT = infoList.get(infoList.size() - 1)[INTENSITY_INDEX];
-
-      double peakSum = ints.get(0);
-      double peakArea = 0;
-      for (int x = 1; x < ints.size(); x++) {
-        double intensity = ints.get(x);
-        double pre_intensity = ints.get(x-1);
-        double rt = rts.get(x);
-        double pre_rt = rts.get(x-1);
-        peakSum += intensity;
-        peakArea += (intensity + pre_intensity) * (rt - pre_rt) / 2;
-      }
-
-      XIC trail = new XIC(
-              mzAtMaxIntensity,
-              rtAtMaxIntensity,
-              maxIntensityIdx,
-              maxColumeIdx,
-              maxRowIdx,
-              startRT,
-              endRT,
-              peakSum,
-              peakArea
-      );
-      trails.add(trail);
-    }
-    int count = 0;
-
-    for (int i = 0; i < infoList.size();i++) {
-      if (infoList.get(i)[IFOCCUPIED_INDEX] == OCCUPIED) {
-        count++;
-      }
-    }
-    double percentage = (double)count/infoList.size();
-    System.out.println("Number of long trails > 20 peaks: " + long_trail_num);
-    System.out.println("Number of peaks covered: " + count + "/" + infoList.size());
-    System.out.println("Percentage: " + percentage);
-    System.out.println("Number of trails detected: " + trails.size());
-    return trails;
   }
 
   /** Initial detection on local maximal intensities on features */
@@ -738,26 +529,24 @@ public class FeatureDetect {
     }
   }
 
-  private void searchProperty(){
-    rtStart = new ArrayList<>();
-    rtEnd = new ArrayList<>();
-    scanNum = new ArrayList<>();
-    quantificationPeaksArea = new ArrayList<>();
-    quantificationPeaksSum = new ArrayList<>();
+  private void detectTrailofPrecursor(){
+    trailsAll = new ArrayList<>();
+
     for (List<Pair<Integer, Integer>> cluster: scorePepAllPos) {
-      List<Double> rtStartCLuster = new ArrayList<>();
-      List<Double> rtEndCLuster = new ArrayList<>();
-      List<Integer> scanNumCLuster = new ArrayList<>();
-      List<Double> quantificationPeaksSumCluster = new ArrayList<>();
-      List<Double> quantificationPeaksAreaCluster = new ArrayList<>();
+      List<XIC> trails = new ArrayList<>();
+
       for (Pair<Integer, Integer> isotope: cluster) {
+        ArrayList<Double>
+                ints = new ArrayList<>(),
+                mzs = new ArrayList<>(),
+                rts = new ArrayList<>();
+
+        ints.add(intensityMap[isotope.getL()][isotope.getR()]);
+        mzs.add(mzMap[isotope.getL()][isotope.getR()]);
+        rts.add(RT[isotope.getL()]);
+
         double lowMZ = mzMap[isotope.getL()][isotope.getR()] * (1-mzSearchRangePPM);
         double hiMZ = mzMap[isotope.getL()][isotope.getR()] * (1+mzSearchRangePPM);
-        int scan_num = 1;
-        double peaks_sum = intensityMap[isotope.getL()][isotope.getR()];
-        double peaks_area = 0;
-        double prev_rt = RT[isotope.getL()];
-        double prev_intensity = peaks_area;
         int leftScan = isotope.getL() - 1;
         int rightScan = isotope.getL() + 1;
         for (;leftScan >= 0 ; leftScan--){
@@ -765,48 +554,33 @@ public class FeatureDetect {
           if (leftPos == InvalidVal) {
             break;
           }
-          // claculate quantification
-          double cur_rt = RT[leftScan];
-          double cur_intensity = intensityMap[leftScan][leftPos];
-          peaks_area += Math.abs ((prev_intensity +cur_intensity) * (prev_rt - cur_rt) / 2);
-          prev_rt = cur_rt;
-          prev_intensity = cur_intensity;
-
-          scan_num++;
-          peaks_sum += cur_intensity;
           lowMZ = mzMap[leftScan][leftPos] * (1-mzSearchRangePPM);
           hiMZ = mzMap[leftScan][leftPos] * (1+mzSearchRangePPM);
+
+          ints.add(0, intensityMap[leftScan][leftPos]);
+          mzs.add(0, mzMap[leftScan][leftPos]);
+          rts.add(0, RT[leftScan]);
+
         }
         for (;rightScan < IDX ; rightScan++){
           int rightPos = searchRange(mzMap[rightScan], lowMZ, hiMZ);
           if (rightPos == InvalidVal) {
             break;
           }
-          // claculate quantification
-          double cur_rt = RT[rightScan];
-          double cur_intensity = intensityMap[rightScan][rightPos];
-          peaks_area += Math.abs ((prev_intensity +cur_intensity) * (prev_rt - cur_rt) / 2);
-          prev_rt = cur_rt;
-          prev_intensity = cur_intensity;
-
-          scan_num++;
-          peaks_sum += cur_intensity;
           lowMZ = mzMap[rightScan][rightPos] * (1-mzSearchRangePPM);
           hiMZ = mzMap[rightScan][rightPos] * (1+mzSearchRangePPM);
+
+          ints.add(intensityMap[rightScan][rightPos]);
+          mzs.add(mzMap[rightScan][rightPos]);
+          rts.add( RT[rightScan]);
         }
         if (leftScan < 0) { leftScan = 0; }
         if (rightScan == IDX) { rightScan = IDX - 1; }
-        rtStartCLuster.add(RT[leftScan+1]);
-        rtEndCLuster.add(RT[rightScan]);
-        scanNumCLuster.add(scan_num);
-        quantificationPeaksSumCluster.add(peaks_sum);
-        quantificationPeaksAreaCluster.add(peaks_area);
+
+        XIC trail = new XIC(ints, mzs, rts);
+        trails.add(trail);
       }
-      rtStart.add(rtStartCLuster);
-      rtEnd.add(rtEndCLuster);
-      scanNum.add(scanNumCLuster);
-      quantificationPeaksSum.add(quantificationPeaksSumCluster);
-      quantificationPeaksArea.add(quantificationPeaksAreaCluster);
+      trailsAll.add(trails);
     }
   }
 
@@ -889,26 +663,46 @@ public class FeatureDetect {
                       + '\t'
                       + "isotope_distribution_score"
                       + '\t'
-                      + "intensity_percentage"
-                      + '\t'
-                      + "rt_start"
-                      + '\t'
-                      + "rt_end"
+                      + "intensity_area_percentage"
                       + '\t'
                       + "scan_num"
                       + '\t'
-                      + "peaks_sum"
+                      + "quantification_peak_sum"
                       + '\t'
-                      + "peaks_area"
+                      + "quantification_peak_area"
+                      + '\t'
+                      + "svr_score"
+                      + '\t'
+                      + "quality_score"
+                      + '\t'
+                      + "mzs,rts,ints"
                       + '\n';
       printWriter.print(header);
 
       for (int i = 0; i < scorePepAll.size(); i++) {
         int size = scorePepAll.get(i).size();
         for (int j = 0; j < size; j++) {
-          Integer id = i + 1;
+          int id = i + 1;
+          XIC trail = trailsAll.get(i).get(j);
+          int scannum = trail.getScanNum();
+          double peak_sum = trail.getPeakSum();
+          double peak_area = trail.getPeakArea();
+
+          ArrayList<Double> ints = trail.getIntensities();
+          ArrayList<Double> mzs = trail.getMassChargeRatios();
+          ArrayList<Double> rts = trail.getRetentionTimes();
+
+          String mzsStr =  mzs.get(0).toString();
+          String rtsStr =  rts.get(0).toString();
+          String intsStr =  ints.get(0).toString();
+          for (int k = 1; k < scannum; k++) {
+            mzsStr += '\t' + mzs.get(k).toString();
+            rtsStr += '\t' + rts.get(k).toString();
+            intsStr += '\t' + ints.get(k).toString();
+          }
+
           String data = "";
-          data += id.toString();
+          data += id;
           data += '\t' + scorePepAll.get(i).get(j).getR().toString();
           data += '\t' + scorePepAll.get(i).get(j).getL().toString();
           data += '\t' + scoreZVal.get(i).toString();
@@ -916,11 +710,14 @@ public class FeatureDetect {
           data += '\t' + scoreIntShape.get(i).toString();
           data += '\t' + scoreIsoDistr.get(i).toString();
           data += '\t' + intensityPercentage.get(i).toString();
-          data += '\t' + rtStart.get(i).get(j).toString();
-          data += '\t' + rtEnd.get(i).get(j).toString();
-          data += '\t' + scanNum.get(i).get(j).toString();
-          data += '\t' + quantificationPeaksSum.get(i).get(j).toString();
-          data += '\t' + quantificationPeaksArea.get(i).get(j).toString();
+          data += '\t' + Integer.toString(scannum);
+          data += '\t' + Double.toString(peak_sum);
+          data += '\t' + Double.toString(peak_area);
+          data += '\t' + "0"; // placeholder for svr_score
+          data += '\t' + "0"; // placeholder for quality score
+          data += '\t' + mzsStr;
+          data += '\t' + rtsStr;
+          data += '\t' + intsStr;
           data += '\n';
           printWriter.print(data);
         }

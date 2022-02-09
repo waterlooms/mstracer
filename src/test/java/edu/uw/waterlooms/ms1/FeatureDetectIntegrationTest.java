@@ -11,7 +11,7 @@ import java.util.Properties;
 
 public class FeatureDetectIntegrationTest {
 
-    @Test
+//    @Test
     public void matchMS1TrailsWithFeatureDetectionResult() throws IOException {
         /* Given */
         String dataDirectory = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/data/";
@@ -27,12 +27,12 @@ public class FeatureDetectIntegrationTest {
         /* When */
         OpenMzxml openMzxml = new OpenMzxml(mzxmlFile);
         FeatureDetect featureDetect = new FeatureDetect(openMzxml, FeatureDetect.DetectionType.MS1);
-//        MS1TrailDetect ms1TrailDetect = new MS1TrailDetect();
 
         /* Then */
 //        featureDetect.detectMS1Trails(mzxmlFile, rtNextPeakTolSec, mzTolerancePPMStrict, MIN_PEAKNUM_Strict, rtMaxRangeSec, intensityNextPeakPercentageTol);
 //        ms1TrailDetect.matchFeatureToTrails(mzxmlFile, dataDirectory, rawFileName, featureDetect.getMS1Trails());
 //        featureDetect.writeMS1TrailsData(dataDirectory + rawFileName + "_ms1_trails.tsv", featureDetect.getMS1Trails());
+        featureDetect.detectFeatures(mzxmlFile);
     }
 
     /**

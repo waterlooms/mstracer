@@ -17,8 +17,6 @@ public class FeatureSelect {
   private int int_shape_index;
   private int iso_distr_index;
   private int intensity_area_percentage_index;
-  private int rt_start_index;
-  private int rt_end_index;
   private int scan_num_index;
   private int quantification_peaks_sum_index;
   private int quantification_peaks_area_index;
@@ -54,7 +52,7 @@ public class FeatureSelect {
    * @param oldFilePath file path with defined suffix
    * @throws IOException
    */
-  public List<SVRScore> finalizeFeature(String oldFilePath) throws IOException {
+  public void finalizeFeature(String oldFilePath) throws IOException {
     setParameters();
     ML ml = ML.NN;
     String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
@@ -62,32 +60,7 @@ public class FeatureSelect {
     model_result = clusterFeature(model_result, mz_error, rt_error);
     model_result.sort(Comparator.comparing(l -> l[quality_index]));
     Collections.reverse(model_result);
-
-    List<SVRScore> svrScores = new ArrayList<>();
-    for (Double[] element : model_result) {
-      SVRScore ms1Precursor =
-          new SVRScore(
-              element[0],
-              element[1],
-              element[2],
-              element[3],
-              element[4],
-              element[5],
-              element[6],
-              element[7],
-              element[8],
-              element[9],
-              element[10],
-              element[11],
-              element[12],
-              element[13],
-              element[14]
-          );
-      svrScores.add(ms1Precursor);
-    }
     writeFile(filepath + "_precursors.tsv", model_result, ml);
-
-    return svrScores;
   }
 
   /**
@@ -103,8 +76,6 @@ public class FeatureSelect {
     int_shape_index = ParameterService.getIntShapeIndex();
     iso_distr_index = ParameterService.getIsoDistrIndex();
     intensity_area_percentage_index = ParameterService.getIntensityAreaPercentageIndex();
-    rt_start_index = ParameterService.getRtStartIndex();
-    rt_end_index = ParameterService.getRtEndIndex();
     scan_num_index = ParameterService.getScanSumIndex();
     quantification_peaks_sum_index = ParameterService.getPeaksSumIndex();
     quantification_peaks_area_index = ParameterService.getPeaksAreaIndex();
@@ -301,10 +272,6 @@ public class FeatureSelect {
       // PrintWriter
       PrintWriter printWriter = new PrintWriter(outputfile);
       // add header
-      String nn_title = "";
-      if (ml == ML.NN) {
-        nn_title = '\t' + "quality_score";
-      }
       String header =
           "id"
               + '\t'
@@ -322,10 +289,6 @@ public class FeatureSelect {
               + '\t'
               + "intensity_area_percentage"
               + '\t'
-              + "rt_start"
-              + '\t'
-              + "rt_end"
-              + '\t'
               + "scan_num"
               + '\t'
               + "quantification_peaks_sum"
@@ -333,39 +296,49 @@ public class FeatureSelect {
               + "quantification_peaks_area"
               + '\t'
               + "svr_score"
-              + nn_title
+              + '\t'
+              + "quality_score"
+              + '\t'
+              + "mzs,rts,ints"
               + '\n';
       printWriter.print(header);
       Integer id = 1;
-      for (int i = 0; i < list.size(); ) {
-        int size = 1;
-        for (int j = 0; j < size; j++) {
-          Integer z = list.get(i + j)[z_index].intValue();
-          Integer iso_num = list.get(i + j)[isonum_index].intValue();
-          String data = "";
-          data += id.toString();
-          data += '\t' + list.get(i + j)[mz_index].toString();
-          data += '\t' + list.get(i + j)[rt_index].toString();
-          data += '\t' + z.toString();
-          data += '\t' + iso_num.toString();
-          data += '\t' + list.get(i + j)[int_shape_index].toString();
-          data += '\t' + list.get(i + j)[iso_distr_index].toString();
-          data += '\t' + list.get(i + j)[intensity_area_percentage_index].toString();
-          data += '\t' + list.get(i + j)[rt_start_index].toString();
-          data += '\t' + list.get(i + j)[rt_end_index].toString();
-          data += '\t' + list.get(i + j)[scan_num_index].toString();
-          data += '\t' + list.get(i + j)[quantification_peaks_sum_index].toString();
-          data += '\t' + list.get(i + j)[quantification_peaks_area_index].toString();
-          data += '\t' + list.get(i + j)[svr_index].toString();
-          if (ml == ML.NN) {
-            data += '\t' + list.get(i + j)[quality_index].toString();
-            data += '\n';
-          } else {
-            data += '\n';
-          }
-          printWriter.print(data);
+      for (int i = 0; i < list.size(); i++) {
+        Integer z = list.get(i)[z_index].intValue();
+        Integer iso_num = list.get(i)[isonum_index].intValue();
+        int scannum = list.get(i)[scan_num_index].intValue();
+        String mzsStr = list.get(i)[quality_index + 1].toString();
+        String rtsStr =  list.get(i)[quality_index + 1 + scannum].toString();
+        String intsStr = list.get(i)[quality_index + 1 + scannum * 2].toString();
+        for (int k = 1; k < scannum; k++) {
+          mzsStr += "\t" + list.get(i)[quality_index + 1 + k];
+          rtsStr += "\t" + list.get(i)[quality_index + 1 + scannum + k];
+          intsStr += "\t" + list.get(i)[quality_index + 1 + scannum * 2 + k];
         }
-        i += size;
+
+        String data = "";
+        data += id.toString();
+        data += '\t' + list.get(i)[mz_index].toString();
+        data += '\t' + list.get(i)[rt_index].toString();
+        data += '\t' + z.toString();
+        data += '\t' + iso_num.toString();
+        data += '\t' + list.get(i)[int_shape_index].toString();
+        data += '\t' + list.get(i)[iso_distr_index].toString();
+        data += '\t' + list.get(i)[intensity_area_percentage_index].toString();
+        data += '\t' + Integer.toString(scannum);
+        data += '\t' + list.get(i)[quantification_peaks_sum_index].toString();
+        data += '\t' + list.get(i)[quantification_peaks_area_index].toString();
+        data += '\t' + list.get(i)[svr_index].toString();
+        if (ml == ML.NN) {
+          data += '\t' + list.get(i)[quality_index].toString();
+        } else if (ml == ML.SVR) {
+          data += '\t' + "0";
+        }
+        data += '\t' + mzsStr;
+        data += '\t' + rtsStr;
+        data += '\t' + intsStr;
+        data += '\n';
+        printWriter.print(data);
         id++;
       }
       // closing writer connection
