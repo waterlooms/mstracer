@@ -149,11 +149,10 @@ public class Main {
     }
 
     // Step 5 : write to mzXMLFile_feature
-    featureSelect.finalizeFeature(mzXMLFile);
+    List<SVRScore> svrScores;
+    svrScores =
+            featureSelect.finalizeFeature(LOCAL_WORKING_DIR + rawFileName);
     System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "...");
-
-    stopWatch.stop();
-    System.out.println("Elapsed Time in Minutes: " + stopWatch.getTime() + " ...");
     System.exit(0);
   }
 }

@@ -52,7 +52,7 @@ public class FeatureSelect {
    * @param oldFilePath file path with defined suffix
    * @throws IOException
    */
-  public void finalizeFeature(String oldFilePath) throws IOException {
+  public List<SVRScore> finalizeFeature(String oldFilePath) throws IOException {
     setParameters();
     ML ml = ML.NN;
     String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
@@ -60,7 +60,31 @@ public class FeatureSelect {
     model_result = clusterFeature(model_result, mz_error, rt_error);
     model_result.sort(Comparator.comparing(l -> l[quality_index]));
     Collections.reverse(model_result);
-    writeFile(filepath + "_precursors.tsv", model_result, ml);
+
+    List<SVRScore> svrScores = new ArrayList<>();
+    for (Double[] element : model_result) {
+      SVRScore ms1Precursor =
+              new SVRScore(
+                      element[0],
+                      element[1],
+                      element[2],
+                      element[3],
+                      element[4],
+                      element[5],
+                      element[6],
+                      element[7],
+                      element[8],
+                      element[9],
+                      element[10],
+                      element[11],
+                      element[12]);
+      svrScores.add(ms1Precursor);
+    }
+
+    writeFile(filepath + "_prefinalzed_precursors.tsv", model_result, ml);
+    writeFinalFile(filepath + "_precursors.tsv", model_result);
+
+    return svrScores;
   }
 
   /**
@@ -334,6 +358,93 @@ public class FeatureSelect {
         } else if (ml == ML.SVR) {
           data += '\t' + "0";
         }
+        data += '\t' + mzsStr;
+        data += '\t' + rtsStr;
+        data += '\t' + intsStr;
+        data += '\n';
+        printWriter.print(data);
+        id++;
+      }
+      // closing writer connection
+      printWriter.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  void writeFinalFile(String filename, List<Double[]> list) throws IOException {
+    File file = new File(filename);
+    try {
+      // create FileWriter object with file as parameter
+      FileWriter outputfile = new FileWriter(file);
+      // PrintWriter
+      PrintWriter printWriter = new PrintWriter(outputfile);
+      // add header
+      String header =
+              "id"
+                      + '\t'
+                      + "mz"
+                      + '\t'
+                      + "rt"
+                      + '\t'
+                      + "z"
+                      + '\t'
+                      + "isotope_num"
+                      + '\t'
+                      + "intensity_shape_score"
+                      + '\t'
+                      + "isotope_distribution_score"
+                      + '\t'
+                      + "intensity_area_percentage"
+                      + '\t'
+                      + "scan_num"
+                      + '\t'
+                      + "quantification_peaks_sum"
+                      + '\t'
+                      + "quantification_peaks_area"
+                      + '\t'
+                      + "svr_score"
+                      + '\t'
+                      + "quality_score"
+                      + '\t'
+                      + "mzs"
+                      + '\t'
+                      + "rts"
+                      + '\t'
+                      + "ints"
+                      + '\n';
+      printWriter.print(header);
+      Integer id = 1;
+      for (int i = 0; i < list.size(); i++) {
+        Integer z = list.get(i)[z_index].intValue();
+        Integer iso_num = list.get(i)[isonum_index].intValue();
+        int scannum = list.get(i)[scan_num_index].intValue();
+        String mzsStr = "[" + list.get(i)[quality_index + 1].toString();
+        String rtsStr = "[" + list.get(i)[quality_index + 1 + scannum].toString();
+        String intsStr = "[" + list.get(i)[quality_index + 1 + scannum * 2].toString();
+        for (int k = 1; k < scannum; k++) {
+          mzsStr += "," + list.get(i)[quality_index + 1 + k];
+          rtsStr += "," + list.get(i)[quality_index + 1 + scannum + k];
+          intsStr += "," + list.get(i)[quality_index + 1 + scannum * 2 + k];
+        }
+        mzsStr += "]";
+        rtsStr += "]";
+        intsStr += "]";
+
+        String data = "";
+        data += id.toString();
+        data += '\t' + list.get(i)[mz_index].toString();
+        data += '\t' + list.get(i)[rt_index].toString();
+        data += '\t' + z.toString();
+        data += '\t' + iso_num.toString();
+        data += '\t' + list.get(i)[int_shape_index].toString();
+        data += '\t' + list.get(i)[iso_distr_index].toString();
+        data += '\t' + list.get(i)[intensity_area_percentage_index].toString();
+        data += '\t' + Integer.toString(scannum);
+        data += '\t' + list.get(i)[quantification_peaks_sum_index].toString();
+        data += '\t' + list.get(i)[quantification_peaks_area_index].toString();
+        data += '\t' + list.get(i)[svr_index].toString();
+        data += '\t' + list.get(i)[quality_index].toString();
         data += '\t' + mzsStr;
         data += '\t' + rtsStr;
         data += '\t' + intsStr;

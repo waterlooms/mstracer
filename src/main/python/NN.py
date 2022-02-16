@@ -11,7 +11,6 @@ import os
 
 class NN:
   def __init__(self):
-    # TODO: Setup the following variables to read from the parameter_dict
     self.ID = 0
     self.mz = 1
     self.rt = 2
@@ -48,7 +47,7 @@ class NN:
     predict_nn = NN.get_prediction(X_nn, path + "/model/NN_feature_rank")
     with open(filepath + "_NNScore.tsv", "w+") as outfile:
       outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\tscan_num\tquantification_peaks_sum\tquantification_peaks_area\tsvr_score\tquality_score\tmzs,rts,ints\n")
-      for i in range(1, len(X_nn)):
+      for i in range(1, len(X_nn) + 1):
         scannum = int(test_data[i][self.scan_num])
         mzsStr = str(test_data[i][self.quality_score + 1])
         rtsStr =  str(test_data[i][self.quality_score + 1 + scannum])

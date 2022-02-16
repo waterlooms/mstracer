@@ -549,13 +549,16 @@ public class FeatureDetect {
         double hiMZ = mzMap[isotope.getL()][isotope.getR()] * (1+mzSearchRangePPM);
         int leftScan = isotope.getL() - 1;
         int rightScan = isotope.getL() + 1;
+        double leftMaxIntensity = intensityMap[isotope.getL()][isotope.getR()];
+        double rightMaxIntensity = intensityMap[isotope.getL()][isotope.getR()];
         for (;leftScan >= 0 ; leftScan--){
           int leftPos = searchRange(mzMap[leftScan], lowMZ, hiMZ);
-          if (leftPos == InvalidVal) {
+          if (leftPos == InvalidVal || intensityMap[leftScan][leftPos] > leftMaxIntensity) {
             break;
           }
           lowMZ = mzMap[leftScan][leftPos] * (1-mzSearchRangePPM);
           hiMZ = mzMap[leftScan][leftPos] * (1+mzSearchRangePPM);
+          leftMaxIntensity = intensityMap[leftScan][leftPos];
 
           ints.add(0, intensityMap[leftScan][leftPos]);
           mzs.add(0, mzMap[leftScan][leftPos]);
@@ -564,11 +567,12 @@ public class FeatureDetect {
         }
         for (;rightScan < IDX ; rightScan++){
           int rightPos = searchRange(mzMap[rightScan], lowMZ, hiMZ);
-          if (rightPos == InvalidVal) {
+          if (rightPos == InvalidVal || intensityMap[rightScan][rightPos] > rightMaxIntensity) {
             break;
           }
           lowMZ = mzMap[rightScan][rightPos] * (1-mzSearchRangePPM);
           hiMZ = mzMap[rightScan][rightPos] * (1+mzSearchRangePPM);
+          rightMaxIntensity = intensityMap[rightScan][rightPos];
 
           ints.add(intensityMap[rightScan][rightPos]);
           mzs.add(mzMap[rightScan][rightPos]);

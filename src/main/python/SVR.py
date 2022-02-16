@@ -45,28 +45,28 @@ class SVR:
 
         with open(filepath + "_SVRScore.tsv", "w+") as outfile:
             outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\tscan_num\tquantification_peaks_sum\tquantification_peaks_area\tsvr_score\tquality_score\tmzs,rts,ints\n")
-            for i in range(len(X_svr)):
-                scannum = int(test_data[i + 1][self.scan_num])
-                mzsStr = test_data[i + 1][self.quality_score + 1]
-                rtsStr =  test_data[i + 1][self.quality_score + 1 + scannum]
-                intsStr =  test_data[i + 1][self.quality_score + 1 + scannum * 2]
+            for i in range(1, len(X_svr) + 1):
+                scannum = int(test_data[i][self.scan_num])
+                mzsStr = test_data[i][self.quality_score + 1]
+                rtsStr =  test_data[i][self.quality_score + 1 + scannum]
+                intsStr =  test_data[i][self.quality_score + 1 + scannum * 2]
                 for j in range(1, scannum):
-                    mzsStr += "\t%s" % test_data[i + 1][self.quality_score + 1 + j]
-                    rtsStr += "\t%s" % test_data[i + 1][self.quality_score + 1 + scannum + j]
-                    intsStr += "\t%s" % test_data[i + 1][self.quality_score + 1 + scannum * 2 + j]
+                    mzsStr += "\t%s" % test_data[i][self.quality_score + 1 + j]
+                    rtsStr += "\t%s" % test_data[i][self.quality_score + 1 + scannum + j]
+                    intsStr += "\t%s" % test_data[i][self.quality_score + 1 + scannum * 2 + j]
 
-                outfile.write("%s\t" % test_data[i + 1][self.ID])
-                outfile.write("%s\t" % test_data[i + 1][self.mz])
-                outfile.write("%s\t" % test_data[i + 1][self.rt])
-                outfile.write("%s\t" % test_data[i + 1][self.z])
-                outfile.write("%s\t" % test_data[i + 1][self.isonum])
-                outfile.write("%s\t" % test_data[i + 1][self.int_shape])
-                outfile.write("%s\t" % test_data[i + 1][self.iso_distr])
-                outfile.write("%s\t" % test_data[i + 1][self.intensity_area_percentage])
+                outfile.write("%s\t" % test_data[i][self.ID])
+                outfile.write("%s\t" % test_data[i][self.mz])
+                outfile.write("%s\t" % test_data[i][self.rt])
+                outfile.write("%s\t" % test_data[i][self.z])
+                outfile.write("%s\t" % test_data[i][self.isonum])
+                outfile.write("%s\t" % test_data[i][self.int_shape])
+                outfile.write("%s\t" % test_data[i][self.iso_distr])
+                outfile.write("%s\t" % test_data[i][self.intensity_area_percentage])
                 outfile.write("%s\t" % scannum)
-                outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_sum])
-                outfile.write("%s\t" % test_data[i + 1][self.quantification_peaks_area])
-                outfile.write("%f\t" % predict_svr[i])
+                outfile.write("%s\t" % test_data[i][self.quantification_peaks_sum])
+                outfile.write("%s\t" % test_data[i][self.quantification_peaks_area])
+                outfile.write("%f\t" % predict_svr[i - 1])
                 outfile.write("0\t")
                 outfile.write(mzsStr + "\t")
                 outfile.write(rtsStr + "\t")
