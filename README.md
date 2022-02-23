@@ -22,7 +22,7 @@ Clone & navigate to the repository.
 git clone https://github.com/waterlooms/mstracer.git
 cd mstracer
 ```
-####Code Setup
+#### Code Setup
 Structure at dia_data_reading/ should look like the following:  
 
 ```
