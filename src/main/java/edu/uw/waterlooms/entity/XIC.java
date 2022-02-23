@@ -21,15 +21,6 @@ public class XIC implements Comparable<XIC>, Serializable {
   private double peakArea;
 
   /**
-   * Lightweight constructor to allow for mz searching.
-   * TODO: REMOVE THIS
-   * @param mz double for MZ of a given XIC.
-   */
-  public XIC(double mz) {
-    this.mzAtMaxIntensity = mz;
-  }
-
-  /**
    * Lightweight constructor to allow for MZ or RT searching.
    * @param mz double for MZ of a given XIC.
    * @param rt double for RT of a given XIC.

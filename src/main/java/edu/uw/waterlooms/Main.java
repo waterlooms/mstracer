@@ -79,8 +79,6 @@ public class Main {
     //String rawFileName = "r01_dia_data.mzXML";
     String rawFileName = "toy.mzXML";
     if ((mzXMLInFile != null && !mzXMLInFile.isEmpty())){
-      // TODO: DIA-WEBAPP submits mzXMLInFile as a path/file.mzXML
-      // TODO: Need to strip this and set rawFileName
       rawFileName = mzXMLInFile;
     }
 
@@ -115,7 +113,6 @@ public class Main {
     svrCommand.add(mzXMLFile);
     processBuilder.command(svrCommand);
     try {
-      // TODO: Suppress output if necessary for python
       Process process = processBuilder.inheritIO().start();
       int exitCode = process.waitFor();
 //      System.out.println("SVR.py exited with code : " + exitCode);
