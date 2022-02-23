@@ -47,9 +47,9 @@ output_file_instruction.txt
 ```
 
 Your data files should be located in the *data/* folder.  
-By default, the program will execute on the *toy.mzXML* file located in *dia_data_reading/data/*.  
-JAVA source files should go under *dia_data_reading/src/main/java/edu/uw/waterlooms/*.  
-PYTHON source files should go under *dia_data_reading/src/main/python/*.
+By default, the program will execute on the *toy.mzXML* file located in *mstracer/data/*.  
+JAVA source files should go under *mstracer/src/main/java/edu/uw/waterlooms/*.  
+PYTHON source files should go under *mstracer/src/main/python/*.
 
 
 
