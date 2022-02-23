@@ -16,7 +16,7 @@ public class ParameterService {
   private static double MIN_REL_HEIGHT = 0.01;
   private static int INVALID_VAL = -1;
   private static double PERCENTAGE_OF_MAX = 0.5;
-  private static int INTENSITY_THRESHOLD = 10000;
+  private static int INTENSITY_THRESHOLD = 1;
   private static int Z_RANGE = 5;
   private static int WINDOW_SIZE = 4;
   private static double INTENSITY_BOUND = 1.5;
@@ -29,17 +29,12 @@ public class ParameterService {
   private static final int ISONUM_INDEX = 4;
   private static final int INT_SHAPE_INDEX = 5;
   private static final int ISO_DISTR_INDEX = 6;
-  private static final int INTENSITY_WINDOW_AVG_INDEX = 7;
-  private static final int INTENSITY_AREA_PERCENTAGE_INDEX = 8;
-  private static final int RT_START_INDEX = 9;
-  private static final int RT_END_INDEX = 10;
-  private static final int SCAN_NUM_INDEX = 11;
-  private static final int INTENSITY_SUM_INDEX = 12;
-  private static final int SVR_INDEX = 13;
-  private static final int QUALITY_INDEX = 14;
-  private static final int MZS_INDEX = 15;
-  private static final int RTS_INDEX = 16;
-  private static final int INTS_INDEX = 17;
+  private static final int INTENSITY_AREA_PERCENTAGE_INDEX = 7;
+  private static final int SCAN_SUM_INDEX = 8;
+  private static final int PEAKS_SUM_INDEX = 9;
+  private static final int PEAKS_AREA_INDEX = 10;
+  private static final int SVR_INDEX = 11;
+  private static final int QUALITY_INDEX = 12;
   private static double MZ_ERROR = 0.000008;
   private static double RT_ERROR = 0.5;
 
@@ -186,28 +181,18 @@ public class ParameterService {
     return ISO_DISTR_INDEX;
   }
 
-  public static int getIntensityWindowAvgIndex() {
-    return INTENSITY_WINDOW_AVG_INDEX;
-  }
-
   public static int getIntensityAreaPercentageIndex() {
     return INTENSITY_AREA_PERCENTAGE_INDEX;
   }
 
-  public static int getRtStartIndex() {
-    return RT_START_INDEX;
+  public static int getScanSumIndex() { return SCAN_SUM_INDEX; }
+
+  public static int getPeaksSumIndex() {
+    return PEAKS_SUM_INDEX;
   }
 
-  public static int getRtEndIndex() {
-    return RT_END_INDEX;
-  }
-
-  public static int getScanNumIndex() {
-    return SCAN_NUM_INDEX;
-  }
-
-  public static int getIntensitySumIndex() {
-    return INTENSITY_SUM_INDEX;
+  public static int getPeaksAreaIndex() {
+    return PEAKS_AREA_INDEX;
   }
 
   public static int getSvrIndex() {
@@ -217,14 +202,6 @@ public class ParameterService {
   public static int getQualityIndex() {
     return QUALITY_INDEX;
   }
-
-  public static int getMzsIndex() {
-    return MZS_INDEX;
-  }
-
-  public static int getIntsIndex() { return INTS_INDEX; }
-
-  public static int getRtsIndex() { return RTS_INDEX; }
 
   public static double getMzError() {
     return MZ_ERROR;

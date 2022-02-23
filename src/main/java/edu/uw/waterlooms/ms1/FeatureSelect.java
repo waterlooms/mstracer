@@ -16,12 +16,10 @@ public class FeatureSelect {
   private int isonum_index;
   private int int_shape_index;
   private int iso_distr_index;
-  private int intensity_window_avg_index;
   private int intensity_area_percentage_index;
-  private int rt_start_index;
-  private int rt_end_index;
   private int scan_num_index;
-  private int intensity_sum_index;
+  private int quantification_peaks_sum_index;
+  private int quantification_peaks_area_index;
   private int svr_index;
   private int quality_index;
   private int invalidVal;
@@ -36,29 +34,29 @@ public class FeatureSelect {
   /**
    * Select charge state based on SVR score; one charge state of a feature
    *
-   * @param filepath file path without defined suffix
+   * @param oldFilePath file path with defined suffix
    * @throws IOException
    */
-  public void selectFeature(String filepath) throws IOException {
+  public void selectFeature(String oldFilePath) throws IOException {
     setParameters();
     ML ml = ML.SVR;
-    model_result = readFile(filepath + "_svr_score");
+    String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
+    model_result = readFile(filepath + "_SVRScore.tsv");
     selectCharge();
     model_result = removeIso(model_result);
-    writeFile(filepath + "_feature_one_z", model_result, ml);
+    writeFile(filepath + "_featureOneZ.tsv", model_result, ml);
   }
   /**
    * Generate the final feature list; last step
    *
-   * @param oldFilePath file path without defined suffix TODO: Refactor this
-   * @param workingDirectory String containing the working directory
-   * @param rawFileName String containing the name of the MSConvert mzXML file (converted from RAW)
+   * @param oldFilePath file path with defined suffix
    * @throws IOException
    */
-  public List<SVRScore> finalizeFeature(String oldFilePath, String workingDirectory, String rawFileName) throws IOException {
+  public List<SVRScore> finalizeFeature(String oldFilePath) throws IOException {
     setParameters();
     ML ml = ML.NN;
-    model_result = readFile(oldFilePath + "_nn_score");
+    String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
+    model_result = readFile(filepath + "_NNScore.tsv");
     model_result = clusterFeature(model_result, mz_error, rt_error);
     model_result.sort(Comparator.comparing(l -> l[quality_index]));
     Collections.reverse(model_result);
@@ -66,27 +64,25 @@ public class FeatureSelect {
     List<SVRScore> svrScores = new ArrayList<>();
     for (Double[] element : model_result) {
       SVRScore ms1Precursor =
-          new SVRScore(
-              element[0],
-              element[1],
-              element[2],
-              element[3],
-              element[4],
-              element[5],
-              element[6],
-              element[7],
-              element[8],
-              element[9],
-              element[10],
-              element[11],
-              element[12],
-              element[13],
-              element[14]);
+              new SVRScore(
+                      element[0],
+                      element[1],
+                      element[2],
+                      element[3],
+                      element[4],
+                      element[5],
+                      element[6],
+                      element[7],
+                      element[8],
+                      element[9],
+                      element[10],
+                      element[11],
+                      element[12]);
       svrScores.add(ms1Precursor);
     }
 
-    // TODO: For each model_result row, save them into svrScores.
-    writeFile(workingDirectory + rawFileName + "_precursors.tsv", model_result, ml);
+    writeFile(filepath + "_prefinalzed_precursors.tsv", model_result, ml);
+    writeFinalFile(filepath + "_precursors.tsv", model_result);
 
     return svrScores;
   }
@@ -103,12 +99,10 @@ public class FeatureSelect {
     isonum_index = ParameterService.getIsonumIndex();
     int_shape_index = ParameterService.getIntShapeIndex();
     iso_distr_index = ParameterService.getIsoDistrIndex();
-    intensity_window_avg_index = ParameterService.getIntensityWindowAvgIndex();
     intensity_area_percentage_index = ParameterService.getIntensityAreaPercentageIndex();
-    rt_start_index = ParameterService.getRtStartIndex();
-    rt_end_index = ParameterService.getRtEndIndex();
-    scan_num_index = ParameterService.getScanNumIndex();
-    intensity_sum_index = ParameterService.getIntensitySumIndex();
+    scan_num_index = ParameterService.getScanSumIndex();
+    quantification_peaks_sum_index = ParameterService.getPeaksSumIndex();
+    quantification_peaks_area_index = ParameterService.getPeaksAreaIndex();
     svr_index = ParameterService.getSvrIndex();
     quality_index = ParameterService.getQualityIndex();
     invalidVal = ParameterService.getInvalidVal();
@@ -203,7 +197,7 @@ public class FeatureSelect {
       }
       i = j;
     }
-    System.out.println("selectCharge completed");
+//    System.out.println("selectCharge completed");
   }
   /**
    * Cluster similar features
@@ -251,8 +245,8 @@ public class FeatureSelect {
       }
       featureGroup.add(newIso);
     }
-    System.out.println("Peptide # after deleting duplicates: " + featureGroup.size());
-    System.out.println("clusterFeature completed");
+    System.out.println("Total reported peptide number: " + featureGroup.size());
+//    System.out.println("clusterFeature completed");
     return featureGroup;
   }
 
@@ -302,10 +296,6 @@ public class FeatureSelect {
       // PrintWriter
       PrintWriter printWriter = new PrintWriter(outputfile);
       // add header
-      String nn_title = "";
-      if (ml == ML.NN) {
-        nn_title = '\t' + "quality_score";
-      }
       String header =
           "id"
               + '\t'
@@ -321,52 +311,145 @@ public class FeatureSelect {
               + '\t'
               + "isotope_distribution_score"
               + '\t'
-              + "intensity_window_evg"
-              + '\t'
               + "intensity_area_percentage"
-              + '\t'
-              + "rt_start"
-              + '\t'
-              + "rt_end"
               + '\t'
               + "scan_num"
               + '\t'
-              + "intensity_sum"
+              + "quantification_peaks_sum"
+              + '\t'
+              + "quantification_peaks_area"
               + '\t'
               + "svr_score"
-              + nn_title
+              + '\t'
+              + "quality_score"
+              + '\t'
+              + "mzs,rts,ints"
               + '\n';
       printWriter.print(header);
       Integer id = 1;
-      for (int i = 0; i < list.size(); ) {
-        int size = 1;
-        for (int j = 0; j < size; j++) {
-          Integer z = list.get(i + j)[z_index].intValue();
-          Integer iso_num = list.get(i + j)[isonum_index].intValue();
-          String data = "";
-          data += id.toString();
-          data += '\t' + list.get(i + j)[mz_index].toString();
-          data += '\t' + list.get(i + j)[rt_index].toString();
-          data += '\t' + z.toString();
-          data += '\t' + iso_num.toString();
-          data += '\t' + list.get(i + j)[int_shape_index].toString();
-          data += '\t' + list.get(i + j)[iso_distr_index].toString();
-          data += '\t' + list.get(i + j)[intensity_window_avg_index].toString();
-          data += '\t' + list.get(i + j)[intensity_area_percentage_index].toString();
-          data += '\t' + list.get(i + j)[rt_start_index].toString();
-          data += '\t' + list.get(i + j)[rt_end_index].toString();
-          data += '\t' + list.get(i + j)[scan_num_index].toString();
-          data += '\t' + list.get(i + j)[intensity_sum_index].toString();
-          data += '\t' + list.get(i + j)[svr_index].toString();
-          if (ml == ML.NN) {
-            data += '\t' + list.get(i + j)[quality_index].toString();
-            data += '\n';
-          } else {
-            data += '\n';
-          }
-          printWriter.print(data);
+      for (int i = 0; i < list.size(); i++) {
+        Integer z = list.get(i)[z_index].intValue();
+        Integer iso_num = list.get(i)[isonum_index].intValue();
+        int scannum = list.get(i)[scan_num_index].intValue();
+        String mzsStr = list.get(i)[quality_index + 1].toString();
+        String rtsStr =  list.get(i)[quality_index + 1 + scannum].toString();
+        String intsStr = list.get(i)[quality_index + 1 + scannum * 2].toString();
+        for (int k = 1; k < scannum; k++) {
+          mzsStr += "\t" + list.get(i)[quality_index + 1 + k];
+          rtsStr += "\t" + list.get(i)[quality_index + 1 + scannum + k];
+          intsStr += "\t" + list.get(i)[quality_index + 1 + scannum * 2 + k];
         }
-        i += size;
+
+        String data = "";
+        data += id.toString();
+        data += '\t' + list.get(i)[mz_index].toString();
+        data += '\t' + list.get(i)[rt_index].toString();
+        data += '\t' + z.toString();
+        data += '\t' + iso_num.toString();
+        data += '\t' + list.get(i)[int_shape_index].toString();
+        data += '\t' + list.get(i)[iso_distr_index].toString();
+        data += '\t' + list.get(i)[intensity_area_percentage_index].toString();
+        data += '\t' + Integer.toString(scannum);
+        data += '\t' + list.get(i)[quantification_peaks_sum_index].toString();
+        data += '\t' + list.get(i)[quantification_peaks_area_index].toString();
+        data += '\t' + list.get(i)[svr_index].toString();
+        if (ml == ML.NN) {
+          data += '\t' + list.get(i)[quality_index].toString();
+        } else if (ml == ML.SVR) {
+          data += '\t' + "0";
+        }
+        data += '\t' + mzsStr;
+        data += '\t' + rtsStr;
+        data += '\t' + intsStr;
+        data += '\n';
+        printWriter.print(data);
+        id++;
+      }
+      // closing writer connection
+      printWriter.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  void writeFinalFile(String filename, List<Double[]> list) throws IOException {
+    File file = new File(filename);
+    try {
+      // create FileWriter object with file as parameter
+      FileWriter outputfile = new FileWriter(file);
+      // PrintWriter
+      PrintWriter printWriter = new PrintWriter(outputfile);
+      // add header
+      String header =
+              "id"
+                      + '\t'
+                      + "mz"
+                      + '\t'
+                      + "rt"
+                      + '\t'
+                      + "z"
+                      + '\t'
+                      + "isotope_num"
+                      + '\t'
+                      + "intensity_shape_score"
+                      + '\t'
+                      + "isotope_distribution_score"
+                      + '\t'
+                      + "intensity_area_percentage"
+                      + '\t'
+                      + "scan_num"
+                      + '\t'
+                      + "quantification_peaks_sum"
+                      + '\t'
+                      + "quantification_peaks_area"
+                      + '\t'
+                      + "svr_score"
+                      + '\t'
+                      + "quality_score"
+                      + '\t'
+                      + "mzs"
+                      + '\t'
+                      + "rts"
+                      + '\t'
+                      + "ints"
+                      + '\n';
+      printWriter.print(header);
+      Integer id = 1;
+      for (int i = 0; i < list.size(); i++) {
+        Integer z = list.get(i)[z_index].intValue();
+        Integer iso_num = list.get(i)[isonum_index].intValue();
+        int scannum = list.get(i)[scan_num_index].intValue();
+        String mzsStr = "[" + list.get(i)[quality_index + 1].toString();
+        String rtsStr = "[" + list.get(i)[quality_index + 1 + scannum].toString();
+        String intsStr = "[" + list.get(i)[quality_index + 1 + scannum * 2].toString();
+        for (int k = 1; k < scannum; k++) {
+          mzsStr += "," + list.get(i)[quality_index + 1 + k];
+          rtsStr += "," + list.get(i)[quality_index + 1 + scannum + k];
+          intsStr += "," + list.get(i)[quality_index + 1 + scannum * 2 + k];
+        }
+        mzsStr += "]";
+        rtsStr += "]";
+        intsStr += "]";
+
+        String data = "";
+        data += id.toString();
+        data += '\t' + list.get(i)[mz_index].toString();
+        data += '\t' + list.get(i)[rt_index].toString();
+        data += '\t' + z.toString();
+        data += '\t' + iso_num.toString();
+        data += '\t' + list.get(i)[int_shape_index].toString();
+        data += '\t' + list.get(i)[iso_distr_index].toString();
+        data += '\t' + list.get(i)[intensity_area_percentage_index].toString();
+        data += '\t' + Integer.toString(scannum);
+        data += '\t' + list.get(i)[quantification_peaks_sum_index].toString();
+        data += '\t' + list.get(i)[quantification_peaks_area_index].toString();
+        data += '\t' + list.get(i)[svr_index].toString();
+        data += '\t' + list.get(i)[quality_index].toString();
+        data += '\t' + mzsStr;
+        data += '\t' + rtsStr;
+        data += '\t' + intsStr;
+        data += '\n';
+        printWriter.print(data);
         id++;
       }
       // closing writer connection

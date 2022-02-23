@@ -1,46 +1,28 @@
 # MSTracer Workflow
 
-ms-tracer version 1.1.0
+MSTracer version 1.1.0
  
  ### Quick Start
-* [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/)  
-Download and install Docker.    
+* [Docker](https://docs.docker.com/engine/install/ubuntu/) download and install docker
+* Run application:
 ```
-sudo apt-get update
-sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - 
-sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
-   $(lsb_release -cs) \
-   stable"
-sudo apt-get update
-sudo apt-get install docker-ce
-
-sudo groupadd docker
-sudo usermod -aG docker $USER
-```  
-Reboot your computer to apply the new group permissions at this point.  
-Install Docker-Compose.  
+docker run --rm -v $PWD:/app -w /app trackerrr/mstracer java -jar /mstracer/mstracer.jar -mzXML [PATH_TO_MZXML]
 ```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-
-sudo chmod +x /usr/local/bin/docker-compose
-```
-### Code Setup
-Clone & navigate to the repository.
-```
-git clone https://github.com/waterlooms/mstracer.git
-cd ms-tracer
-```
-
-### Usage 
-Put your .mzXML or .mzML file in ``` data/ ``` or any designated folder.
+Note: Put your .mzXML file in ``` data/ ``` or any designated folder.
 Your output files will be generated in that folder as well.
 
 In the commands, replace ```your-file-name.mzXML``` with your file name, or try with a preloaded data ```sample.mzXML```.
 
-The output file is```your-file-name_mstracer.tsv```.
+The output file is```your-file-name_precursors.tsv```.
 
+### Developer Usage 
+
+Clone & navigate to the repository.
+```
+git clone https://github.com/waterlooms/mstracer.git
+cd mstracer
+```
+####Code Setup
 Structure at dia_data_reading/ should look like the following:  
 
 ```

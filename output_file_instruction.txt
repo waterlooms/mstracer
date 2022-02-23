@@ -1,3 +1,4 @@
+*_precursors.tsv
 id  --  index
 mz  --  mass to charge ratio of the maximal peak
 rt  --  retention time of the maximal peak

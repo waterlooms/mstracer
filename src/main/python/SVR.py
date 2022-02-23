@@ -1,17 +1,14 @@
 #!/usr/bin/python
-
-# TODO: Suppress warnings but not errors in production
-
 import csv
 import pickle
 import sys
-sys.path.append("/waterlooms/src/main/python") #TODO Possibly remove this
+import os
+sys.path.append("/mstracer/src/main/python")
 
 import argparse
 
 class SVR:
     def __init__(self):
-        # TODO: Setup the following variables to read from the parameter_dict
         self.ID = 0
         self.mz = 1
         self.rt = 2
@@ -19,19 +16,19 @@ class SVR:
         self.isonum = 4
         self.int_shape = 5
         self.iso_distr = 6
-        self.intensity_window_avg = 7
-        self.intensity_area_percentage = 8
-        self.rt_start = 9
-        self.rt_end = 10
-        self.scan_num = 11
-        self.intensity_sum = 12
+        self.intensity_area_percentage = 7
+        self.scan_num = 8
+        self.quantification_peaks_sum = 9
+        self.quantification_peaks_area = 10
+        self.svr_score = 11
+        self.quality_score = 12
 
     # TO-DO: change to run(self, feature_file, parameter_dict)
     def run(self, feature_file):
         start = self.isonum
         end = self.iso_distr
-        filepath = feature_file
-        with open(filepath + "_feature_all_z", 'r') as file:
+        filepath = os.path.splitext(feature_file)[0]
+        with open(filepath + "_featureAllZ.tsv", 'r') as file:
             reader = csv.reader(file, delimiter='\t')
             test_data = list(reader)
         X_svr = test_data[1: len(test_data)]  # jump header
@@ -42,28 +39,39 @@ class SVR:
             for j in range(0, len(X_svr[i])):
                 X_svr[i][j] = float(X_svr[i][j])
 
-        path = "/mstracer/src/main/python" #TODO Finalize the pathing
+        path = "/mstracer/src/main/python"
         clf = pickle.load(open(path + "/model/SVR_z_selection", 'rb'))
         predict_svr = clf.predict(X_svr)
 
-        with open(filepath + "_svr_score", "w+") as outfile:
-            outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_intensity_window_avg\tintensity_intensity_area_percentage\trt_start\trt_end\tscan_num\tintensity_sum\tSVRscore\n")
-            for i in range(len(X_svr)):
-                outfile.write("%s\t" % test_data[i + 1][self.ID])
-                outfile.write("%s\t" % test_data[i + 1][self.mz])
-                outfile.write("%s\t" % test_data[i + 1][self.rt])
-                outfile.write("%s\t" % test_data[i + 1][self.z])
-                outfile.write("%s\t" % test_data[i + 1][self.isonum])
-                outfile.write("%s\t" % test_data[i + 1][self.int_shape])
-                outfile.write("%s\t" % test_data[i + 1][self.iso_distr])
-                outfile.write("%s\t" % test_data[i + 1][self.intensity_window_avg])
-                outfile.write("%s\t" % test_data[i + 1][self.intensity_area_percentage])
-                outfile.write("%s\t" % test_data[i + 1][self.rt_start])
-                outfile.write("%s\t" % test_data[i + 1][self.rt_end])
-                outfile.write("%s\t" % test_data[i + 1][self.scan_num])
-                outfile.write("%s\t" % test_data[i + 1][self.intensity_sum])
-                outfile.write("%f\n" % predict_svr[i])
-        print("Done!")
+        with open(filepath + "_SVRScore.tsv", "w+") as outfile:
+            outfile.write("id\tmz\trt\tz\tisotope_num\tintensity_shape_score\tisotope_distribution_score\tintensity_area_percentage\tscan_num\tquantification_peaks_sum\tquantification_peaks_area\tsvr_score\tquality_score\tmzs,rts,ints\n")
+            for i in range(1, len(X_svr) + 1):
+                scannum = int(test_data[i][self.scan_num])
+                mzsStr = test_data[i][self.quality_score + 1]
+                rtsStr =  test_data[i][self.quality_score + 1 + scannum]
+                intsStr =  test_data[i][self.quality_score + 1 + scannum * 2]
+                for j in range(1, scannum):
+                    mzsStr += "\t%s" % test_data[i][self.quality_score + 1 + j]
+                    rtsStr += "\t%s" % test_data[i][self.quality_score + 1 + scannum + j]
+                    intsStr += "\t%s" % test_data[i][self.quality_score + 1 + scannum * 2 + j]
+
+                outfile.write("%s\t" % test_data[i][self.ID])
+                outfile.write("%s\t" % test_data[i][self.mz])
+                outfile.write("%s\t" % test_data[i][self.rt])
+                outfile.write("%s\t" % test_data[i][self.z])
+                outfile.write("%s\t" % test_data[i][self.isonum])
+                outfile.write("%s\t" % test_data[i][self.int_shape])
+                outfile.write("%s\t" % test_data[i][self.iso_distr])
+                outfile.write("%s\t" % test_data[i][self.intensity_area_percentage])
+                outfile.write("%s\t" % scannum)
+                outfile.write("%s\t" % test_data[i][self.quantification_peaks_sum])
+                outfile.write("%s\t" % test_data[i][self.quantification_peaks_area])
+                outfile.write("%f\t" % predict_svr[i - 1])
+                outfile.write("0\t")
+                outfile.write(mzsStr + "\t")
+                outfile.write(rtsStr + "\t")
+                outfile.write(intsStr + "\n")
+        print("Assaigning SVR Score Finished!")
 
 
 

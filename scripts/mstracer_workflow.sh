@@ -25,7 +25,7 @@ mvn clean install package
 
 
 
-docker run -it -v $PWD:/data mstracer:1.0 java -jar mstracer.jar -detectionParams featuredetect.params -selectionParams featureselection.params
+docker run --rm -v $PWD:/app -w /app trackerrr/mstracer java -jar /mstracer/mstracer.jar -mzXML [PATH_TO_MZXML]
 
 
 

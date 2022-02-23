@@ -79,8 +79,6 @@ public class Main {
     //String rawFileName = "r01_dia_data.mzXML";
     String rawFileName = "toy.mzXML";
     if ((mzXMLInFile != null && !mzXMLInFile.isEmpty())){
-      // TODO: DIA-WEBAPP submits mzXMLInFile as a path/file.mzXML
-      // TODO: Need to strip this and set rawFileName
       rawFileName = mzXMLInFile;
     }
 
@@ -88,11 +86,7 @@ public class Main {
     String mzXMLFile =
             (mzXMLInFile != null && !mzXMLInFile.isEmpty())
                     ? mzXMLInFile
-                    : LOCAL_WORKING_DIR + rawFileName;
-    String outDir =
-            (outputDir != null && !outputDir.isEmpty())
-                    ? outputDir
-                    : LOCAL_WORKING_DIR + "output/";
+                    : DOCKER_WORKING_DIR + rawFileName;
 
     // Sanity check for file existence(s)
     File mzXMLIn = new File(mzXMLFile);
@@ -116,13 +110,12 @@ public class Main {
     ArrayList<String> svrCommand = new ArrayList<>(processBuilderCommand);
     svrCommand.add("/mstracer/src/main/python/SVR.py");
     svrCommand.add("-features");
-    svrCommand.add(DOCKER_WORKING_DIR + rawFileName);
+    svrCommand.add(mzXMLFile);
     processBuilder.command(svrCommand);
     try {
-      // TODO: Suppress output if necessary for python
       Process process = processBuilder.inheritIO().start();
       int exitCode = process.waitFor();
-      System.out.println("\nSVR.py exited with code : " + exitCode);
+//      System.out.println("SVR.py exited with code : " + exitCode);
     } catch (InterruptedException $e) {
       $e.printStackTrace();
     }
@@ -131,35 +124,27 @@ public class Main {
     System.out.println("Selecting charge with FeatureSelect ...");
     FeatureSelect featureSelect = new FeatureSelect();
     featureSelect.selectFeature(
-            LOCAL_WORKING_DIR + rawFileName);
+            mzXMLFile);
 
     // Step 4 : write to mzXMLFile_nn_score
     ArrayList<String> nnCommand = new ArrayList<>(processBuilderCommand);
     nnCommand.add("/mstracer/src/main/python/NN.py");
     nnCommand.add("-features");
-    nnCommand.add(DOCKER_WORKING_DIR + rawFileName);
+    nnCommand.add(mzXMLFile);
 
     processBuilder.command(nnCommand);
     try {
       Process process = processBuilder.start();
       int exitCode = process.waitFor();
-      System.out.println("\nNN.py exited with code : " + exitCode);
+//      System.out.println("NN.py exited with code : " + exitCode);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
 
     // Step 5 : write to mzXMLFile_feature
-    // Updated to just save as a list of SVRScores
     List<SVRScore> svrScores;
-    svrScores =
-            featureSelect.finalizeFeature(
-                    LOCAL_WORKING_DIR + rawFileName,
-                    LOCAL_WORKING_DIR, rawFileName
-            );
-    System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "...");
-
-    stopWatch.stop();
-    System.out.println("Elapsed Time in Minutes: " + stopWatch.getTime() + " ...");
+    svrScores = featureSelect.finalizeFeature(mzXMLFile);
+    System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "!");
     System.exit(0);
   }
 }

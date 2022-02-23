@@ -1,6 +1,4 @@
 version: '2.3'
-
-# TODO: Map the USER into this container as well so the user doesn't have to use sudo
 services:
   mstracer:
     build: ./
