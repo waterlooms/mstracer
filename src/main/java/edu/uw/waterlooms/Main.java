@@ -118,7 +118,7 @@ public class Main {
       // TODO: Suppress output if necessary for python
       Process process = processBuilder.inheritIO().start();
       int exitCode = process.waitFor();
-      System.out.println("\nSVR.py exited with code : " + exitCode);
+//      System.out.println("SVR.py exited with code : " + exitCode);
     } catch (InterruptedException $e) {
       $e.printStackTrace();
     }
@@ -139,7 +139,7 @@ public class Main {
     try {
       Process process = processBuilder.start();
       int exitCode = process.waitFor();
-      System.out.println("\nNN.py exited with code : " + exitCode);
+//      System.out.println("NN.py exited with code : " + exitCode);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }

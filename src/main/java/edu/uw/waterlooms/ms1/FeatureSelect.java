@@ -197,7 +197,7 @@ public class FeatureSelect {
       }
       i = j;
     }
-    System.out.println("selectCharge completed");
+//    System.out.println("selectCharge completed");
   }
   /**
    * Cluster similar features
@@ -245,8 +245,8 @@ public class FeatureSelect {
       }
       featureGroup.add(newIso);
     }
-    System.out.println("Peptide # after deleting duplicates: " + featureGroup.size());
-    System.out.println("clusterFeature completed");
+    System.out.println("Total reported peptide number: " + featureGroup.size());
+//    System.out.println("clusterFeature completed");
     return featureGroup;
   }
 

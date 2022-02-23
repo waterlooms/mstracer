@@ -75,7 +75,7 @@ class NN:
         outfile.write(mzsStr + "\t")
         outfile.write(rtsStr + "\t")
         outfile.write(intsStr + "\n")
-    print("Done!")
+    print("Assaigning NN Score Finished!")
 
   def get_prediction(X_test, fname):
     model = keras.models.load_model(fname)

@@ -99,13 +99,13 @@ public class FeatureDetect {
     String filepath = oldFilePath.replaceFirst("[.][^.]+$", "");
     init_MS1();
     findLocalMax();
-    System.out.println("findLocalMax completed");
+//    System.out.println("findLocalMax completed");
     searchIsotope(window_size, z_range);
-    System.out.println("searchIsotope completed");
+//    System.out.println("searchIsotope completed");
     isoDistributionScore();
-    System.out.println("isoDistributionScore completed");
+//    System.out.println("isoDistributionScore completed");
     detectTrailofPrecursor();
-    System.out.println("detectTrailofPrecursor completed");
+//    System.out.println("detectTrailofPrecursor completed");
     try {
       writeFeatures(
               filepath
@@ -178,8 +178,8 @@ public class FeatureDetect {
         z_range=8;
       }
     }
-    System.out.println("window_size: " + window_size);
-    System.out.println("z_range: " + z_range);
+//    System.out.println("window_size: " + window_size);
+    System.out.println("Charge state searched: 1 ... " + z_range);
   }
 
   /** Initial detection on local maximal intensities on features */
@@ -495,7 +495,7 @@ public class FeatureDetect {
         }
       }
     }
-    System.out.println("All peptide found before deleting duplicates: " + groupID);
+//    System.out.println("All peptide found before deleting duplicates: " + groupID);
   }
 
   private void isoDistributionScore() {

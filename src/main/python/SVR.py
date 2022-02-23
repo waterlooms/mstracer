@@ -71,7 +71,7 @@ class SVR:
                 outfile.write(mzsStr + "\t")
                 outfile.write(rtsStr + "\t")
                 outfile.write(intsStr + "\n")
-        print("Done!")
+        print("Assaigning SVR Score Finished!")
 
 
 
