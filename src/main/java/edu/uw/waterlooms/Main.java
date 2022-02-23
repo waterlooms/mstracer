@@ -88,11 +88,7 @@ public class Main {
     String mzXMLFile =
             (mzXMLInFile != null && !mzXMLInFile.isEmpty())
                     ? mzXMLInFile
-                    : LOCAL_WORKING_DIR + rawFileName;
-    String outDir =
-            (outputDir != null && !outputDir.isEmpty())
-                    ? outputDir
-                    : LOCAL_WORKING_DIR + "output/";
+                    : DOCKER_WORKING_DIR + rawFileName;
 
     // Sanity check for file existence(s)
     File mzXMLIn = new File(mzXMLFile);
@@ -151,7 +147,7 @@ public class Main {
     // Step 5 : write to mzXMLFile_feature
     List<SVRScore> svrScores;
     svrScores =
-            featureSelect.finalizeFeature(LOCAL_WORKING_DIR + rawFileName);
+            featureSelect.finalizeFeature(DOCKER_WORKING_DIR + rawFileName);
     System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "...");
     System.exit(0);
   }
