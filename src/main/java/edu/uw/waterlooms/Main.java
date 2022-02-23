@@ -146,9 +146,8 @@ public class Main {
 
     // Step 5 : write to mzXMLFile_feature
     List<SVRScore> svrScores;
-    svrScores =
-            featureSelect.finalizeFeature(DOCKER_WORKING_DIR + rawFileName);
-    System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "...");
+    svrScores = featureSelect.finalizeFeature(mzXMLFile);
+    System.out.println("Completed MSTracer Precursor Detection for " + rawFileName + "!");
     System.exit(0);
   }
 }

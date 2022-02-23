@@ -13,7 +13,7 @@ VOLUME /mstracer
 # Compile Dependencies in order to run Pythonic Code
 RUN apt-get update && \
 	apt-get install -y maven && \
-	pip install python-dotenv h5py tensorflow-gpu==2.0.0 scikit-learn==0.22.2.post1
+	pip install python-dotenv h5py tensorflow-gpu==2.0.0 scikit-learn==0.22
 
 # Export Python executables to the PATH
 ENV PATH=/waterlooms/src/main/python:$PATH

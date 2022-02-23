@@ -1,13 +1,15 @@
 #!/usr/bin/python
 
 import tensorflow.compat.v1 as tf
-
 tf.disable_v2_behavior()
+
 from tensorflow import keras
 import numpy as np
 import csv
 import math
 import os
+
+tf.logging.set_verbosity(tf.logging.ERROR)
 
 class NN:
   def __init__(self):
