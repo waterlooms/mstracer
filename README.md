@@ -1,4 +1,4 @@
-# MSTracer Workflow
+# MSTracer -- Now Available on Docker Hub!
 
 MSTracer version 1.1.0
  
@@ -11,7 +11,7 @@ docker run --rm -v $PWD:/app -w /app trackerrr/mstracer java -jar /mstracer/mstr
 Note: Put your .mzXML file in ``` data/ ``` or any designated folder.
 Your output files will be generated in that folder as well.
 
-In the commands, replace ```your-file-name.mzXML``` with your file name, or try with a preloaded data ```sample.mzXML```.
+In the commands, replace ```[PATH_TO_MZXML]``` with the path to your file, or try with a preloaded data ```sample.mzXML```.
 
 The output file is```your-file-name_precursors.tsv```.
 
