@@ -54,12 +54,9 @@ PYTHON source files should go under *mstracer/src/main/python/*.
 
 
 #### Troubleshooting
-##### Note1
+##### Note
 Should there be any issue with Step 4, another way is to run ```NN.py``` using PyCharm. 
 
 Right click the "tensorflow" at the third line, choose "Show Context Actions"; choose "install package tensorflow". This sets up a virtual environment that runs Tensorflow.
 
 In the configuration, (1) choose Python from Templates. (2)Set the script path to that of ```NN.py``` (e.g.```home/Desktop/ms-tracer/src/main/python/NN.py```). (3) Parameters should be "-feature data/your-file-name.mzXML" 
-
-##### Note2
-If you encounter any issues please feel free to reach by emailing x25zeng@uwaterloo.ca.
